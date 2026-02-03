@@ -1,0 +1,346 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | BPS Kota Solok</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <style>
+    :root{
+      --bps-blue: rgba(35, 110, 155, 1);
+      --bps-blue-light: rgba(35, 110, 155, 1);
+    }
+
+    body{
+      zoom: 90%;
+      margin:0;
+      height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      font-family:Arial,Helvetica,sans-serif;
+      position:relative;
+      overflow:hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: 
+          linear-gradient(rgba(35, 110, 155, 0.7), rgba(35, 110, 155, 1)),
+          url(https://bps1372.github.io/ARUNA/assest/aruna.jpg);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      z-index: -1;
+    }
+
+    .login-box{
+      zoom: 90%;
+      width:800px;
+      height:470px;
+      background:white;
+      border-radius:18px;
+      display:flex;
+      overflow:hidden;
+      box-shadow:0 20px 40px rgba(0,0,0,.3);
+      animation:fade .6s ease;
+      margin: 0;
+      display: flex;
+      justify-content: center; /* Mengetengahkan secara horizontal */
+    }
+
+    @keyframes fade{
+      from{opacity:0;transform:translateY(15px)}
+      to{opacity:1;transform:none}
+    }
+
+    .left{
+      flex:1;
+      background: linear-gradient(rgba(35, 110, 155, 0.9), rgba(35, 110, 155, 0.75));
+      color:white;
+      padding:50px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+    }
+
+    /* Layout Logo Baru: Sejajar ke samping */
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .left h1{
+      font-size:42px;
+      margin-bottom:10px;
+      line-height:1.2;
+      font-weight: 800;
+    }
+
+    .left p{
+      font-size:15px;
+      opacity:.9;
+      max-width:360px;
+      line-height: 1.5;
+    }
+
+    .btn-info {
+      width: fit-content;
+      background: transparent;
+      border: 1px solid white;
+      color: white;
+      padding: 10px 20px;
+      margin-top: 20px;
+      font-size: 13px;
+      transition: 0.3s;
+      cursor: pointer;
+    }
+
+    .btn-info:hover {
+      background: white;
+      color: var(--bps-blue);
+    }
+
+    .right{
+      flex:1;
+      padding:50px 45px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+    }
+
+    .right h2{
+      margin:10px 0 4px;
+      font-size:26px;
+      color:#222;
+    }
+
+    .right p{
+      font-size:14px;
+      color:#666;
+      margin-bottom:26px;
+    }
+
+    input{
+      width:100%;
+      padding:13px;
+      margin-bottom:15px;
+      border-radius:8px;
+      border:1px solid #ccc;
+      box-sizing: border-box;
+      font-size:14px;
+    }
+
+    .pw-box{
+      position:relative;
+    }
+
+    .pw-toggle{
+      position:absolute;
+      right:12px;
+      top:50%;
+      transform:translateY(-50%);
+      cursor:pointer;
+      font-size:12px;
+      color:var(--bps-blue);
+      user-select: none;
+    }
+
+    .btn-login{
+      width:100%;
+      padding:13px;
+      background:var(--bps-blue);
+      border:none;
+      color:white;
+      border-radius:8px;
+      cursor:pointer;
+      font-weight:bold;
+      letter-spacing:.5px;
+      margin-top:5px;
+    }
+
+    .footer{
+      margin-top:30px;
+      font-size:12px;
+      color:#777;
+      text-align:center;
+    }
+
+    /* Style Ikon Sosial/Kontak */
+    .contact-icons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    .icon-link {
+      font-size: 20px;
+      transition: 0.3s;
+    }
+
+    .icon-wa { color: #25D366; }
+    .icon-email { color: #EA4335; }
+    .icon-link:hover { transform: scale(1.2); opacity: 0.8; }
+
+    /* MODAL STYLES */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 100;
+      left: 0; top: 0; width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-content {
+      background-color: white;
+      margin: 5% auto;
+      padding: 30px;
+      border-radius: 15px;
+      width: 80%;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .close {
+      color: #aaa;
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    @media(max-width:768px){
+      .login-box{ flex-direction:column; height:auto; }
+      .left{ padding:30px; }
+      .header-logo { justify-content: center; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="login-box">
+    <div class="left">
+      <div class="header-logo">
+        <img src="https://www.bps.go.id/_next/image?url=%2Fassets%2Flogo-bps.png&w=3840&q=75" width="60" style="filter: brightness(0) invert(1);">
+        <div style="font-size: 18px; color: white; font-weight: bold; font-style: italic; line-height: 1.2;">
+          Badan Pusat Statistik<br>Kota Solok
+        </div>
+      </div>
+      
+      <h1>ARUNA</h1>
+      <p>
+        Akurasi RPD Unggul, Niscaya Akuntabel<br>
+        Website manajemen rencana penarikan anggaran,
+        real-time, dan mudah digunakan.
+      </p>
+      <button class="btn-info" onclick="openModal()">Pelajari Lebih Lanjut</button>
+      <p style="margin-top: 40px; font-size: 12px; opacity: 0.7;"> © 2026 BPS Kota Solok </p>
+    </div>
+
+    <div class="right">
+      <h2>Selamat Datang</h2>
+      <p>Silakan masuk ke akun ARUNA Anda</p>
+
+      <input id="username" placeholder="Username">
+
+      <div class="pw-box">
+        <input id="password" type="password" placeholder="Password">
+        <span class="pw-toggle" onclick="toggle()">
+          <i id="eye-icon" class="fas fa-eye"></i>
+        </span>
+      </div>
+
+      <button class="btn-login" onclick="login()">LOGIN</button>
+
+      <div id="errorMsg" class="error-msg" style="display:none; color: red; font-size: 12px; margin-top: 10px;"></div>
+
+      <div class="footer">
+        Ada Kendala? <br>
+        <div class="contact-icons">
+          <a href="https://wa.me/6285263663540?text=Halo%20Admin%20ARUNA,%20saya%20butuh%20bantuan." target="_blank" class="icon-link icon-wa" title="WhatsApp Admin">
+            <i class="fab fa-whatsapp"></i>
+          </a>
+          <a href="https://mail.google.com/mail/?view=cm&fs=1&to=arunabps1372@gmail.com&su=Kendala%20Aplikasi%20ARUNA" target="_blank" class="icon-link icon-email" title="Email Admin">
+            <i class="fas fa-envelope"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+ <div id="guideModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <div class="guide-content">
+      <h2 style="color: var(--bps-blue); border-bottom: 2px solid #eee; padding-bottom: 10px;">Panduan Website ARUNA</h2>
+      
+      <h3>Apa itu ARUNA?</h3>
+      <p>ARUNA (Akurasi RPD Unggul, Niscaya Akuntabel) adalah website sistem internal BPS Kota Solok untuk memonitoring pengajuan dan realisasi anggaran secara digital.</p>
+
+      <h3>Cara Menggunakan:</h3>
+      <ul>
+        <li><b>Login:</b> Gunakan username dan password yang telah diberikan oleh admin.</li>
+        <li><b>Input Anggaran:</b> Pilih menu "Input Anggaran", isi item kegiatan, jumlah diajukan, dan keterangan tambahan.</li>
+        <li><b>Monitoring:</b> tabel monitoring serta rincian infografis anggaran diajukan dan ter-realisasi.</li>
+        <li><b>Download:</b> Anda dapat mengekspor data ke format Excel untuk keperluan laporan offline.</li>
+      </ul>
+
+     
+                
+      
+      <button style="margin-top: 20px;" onclick="closeModal()">SAYA MENGERTI</button>
+    </div>
+  </div>
+</div>
+
+  <script>
+    function toggle(){
+      const p = document.getElementById("password");
+      p.type = p.type === "password" ? "text" : "password";
+    }
+    function openModal() { document.getElementById("guideModal").style.display = "block"; }
+    function closeModal() { document.getElementById("guideModal").style.display = "none"; }
+    
+    window.onclick = function(event) {
+      if (event.target == document.getElementById("guideModal")) { closeModal(); }
+    }
+
+    function login(){
+      const u = document.getElementById("username").value;
+      const p = document.getElementById("password").value;
+      if(!u || !p) { showError("Username dan password wajib diisi."); return; }
+      
+      // Integrasi dengan Apps Script
+      if(typeof google !== 'undefined') {
+        google.script.run.withSuccessHandler(res=>{
+          if(res.status === "success"){
+            window.top.location.href = res.url;
+          }else{
+            showError("Username atau password salah");
+          }
+        }).loginUser(u,p);
+      } else {
+        console.log("Running in local environment");
+      }
+    }
+
+    function showError(msg) {
+      const err = document.getElementById("errorMsg");
+      err.style.display = "block";
+      err.innerText = msg;
+    }
+  </script>
+</body>
+</html>
