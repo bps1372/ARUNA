@@ -1,0 +1,1173 @@
+
+<!-- Keterangan Data -->
+<!-- valRealisasi dan valrealisasi2: data total RPD (inputanuser)-->
+<!-- valpagu: data total pagu-->
+<!-- valSisa: data selisih (TOTAL RPD - TOTAL PAGU)--> 
+
+
+<? var user = getUser(); ?>
+<!DOCTYPE html>
+<html>
+<head>
+<base target="_top">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard | ARUNA BPS</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<style>
+  body { zoom: 68%; }
+  :root{ 
+    /* UPDATE WARNA DI SINI */
+    --blue: rgba(35, 110, 155, 0.8); 
+    --blue-dark: #224b74; 
+    --light: #f4f7fb; 
+    --danger: #e53935; 
+    --success: #25D366; 
+    --warning: #fbc02d; 
+    --text-dark: #333; 
+    --sidebar-width: 260px; 
+  }
+  * { box-sizing:border-box; font-family: 'Poppins', sans-serif; }
+  body { margin:0; background:var(--light); color: var(--text-dark); }
+
+  /* Layout & Sidebar */
+  .app { 
+  display:grid; 
+  grid-template-columns: var(--sidebar-width) 1fr; 
+  min-height:100vh; 
+  transition: 0.3s; 
+  align-items: stretch; /* Tambahkan ini agar semua kolom sama tinggi */
+}
+  .sidebar { 
+  background: linear-gradient(180deg, var(--blue) 0%, var(--blue-dark) 100%); 
+  color:white; 
+  padding:25px; 
+  box-shadow: 4px 0 10px rgba(0,0,0,0.1); 
+  position: relative; 
+  z-index: 10; 
+  border-bottom-right-radius: 60px;
+  /* Tambahkan kode di bawah ini */
+  display: flex;
+  flex-direction: column;
+  min-height: 150vh; /* Memastikan tinggi minimal setinggi layar */
+}
+  .profile { background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; margin-bottom:30px; font-size:13px; color:#eaf3ff; border: 1px solid rgba(255,255,255,0.2); }
+  .menu a { display:flex; align-items: center; gap: 10px; padding:12px 15px; border-radius:10px; margin-bottom:8px; color:#eaf3ff; text-decoration:none; cursor:pointer; transition: 0.3s; }
+  .menu a:hover, .menu a.active { background: rgba(255,255,255,0.2); transform: translateX(5px); }
+  .menu a.logout { background: rgba(229, 57, 53, 0.8); margin-top:10px; }
+
+  /* Content */
+  .content { padding:30px; overflow-y: auto; min-height: 100vh; }
+
+  /* Background Image */
+  body::before {
+    content: "";
+    position: fixed; 
+    inset: 0;
+    background: 
+        linear-gradient(rgba(255,255,255,0.88), rgba(255,255,255,0.88));
+    background-size: cover;  
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: -1;
+  }
+
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:25px; }
+  .card { background:white; border-radius:16px; padding:25px; box-shadow:0 10px 25px rgba(0,0,0,.05); cursor:pointer; transition: 0.3s; border-bottom: 4px solid transparent; }
+  .card:hover { transform: translateY(-5px); border-bottom-color: var(--blue); }
+  .card i { font-size: 2rem; color: var(--blue); margin-bottom: 15px; }
+
+  .panel { 
+  display:none; 
+  background:white; 
+  padding:30px; 
+  padding-bottom: 60px; /* Tambahkan ini agar ada ruang di bawah grafik */
+  border-radius:16px; 
+  box-shadow:0 10px 30px rgba(0,0,0,.08); 
+  animation: fadeIn 0.4s ease; 
+}
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  input, select, textarea { width:100%; padding:10px; margin-bottom:15px; border: 1px solid #ddd; border-radius:8px; font-size: 14px; background: #fafafa; }
+  .btn-group { display: flex; gap: 10px; margin-top: 10px; }
+  .btn { padding:10px 20px; border:none; border-radius:8px; cursor:pointer; color:white; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; }
+  .btn-add { background:var(--blue); }
+  .btn-del { background:var(--danger); }
+  .btn-excel { background-color: #1D6F42; }
+
+  /* Style Tombol Inline di Tabel Akun */
+  .btn-save-inline { background: var(--blue); color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+  .btn-cancel-inline { background: #ccc; color: #333; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+
+  /* MATRIKS TABLE STYLE */
+  .table-responsive { overflow-x:auto; border-radius: 8px; border: 1px solid #eee; background: white; }
+  
+  #tabelRekap { width:100%; border-collapse:separate; border-spacing: 0; white-space: nowrap; }
+  #tabelRekap th, #tabelRekap td { border-bottom:1px solid #eee; border-right: 1px solid #eee; padding:10px 8px; font-size:12px; vertical-align: middle; }
+  
+  #tabelRekap thead th { background:var(--blue); color: white; text-align: center; font-weight: 600; text-transform: uppercase; font-size: 11px; }
+  
+  /* Sticky Columns Logic */
+  #tabelRekap th.sticky, #tabelRekap td.sticky { 
+      position: sticky; 
+      background-color: #fff; 
+      z-index: 2;
+  }
+  
+  /* Sticky Positions (4 Kolom Kode) */
+  #tabelRekap th:nth-child(1), #tabelRekap td:nth-child(1) { left: 0; min-width: 50px; text-align: center; border-right: 1px solid #ddd; }
+  #tabelRekap th:nth-child(2), #tabelRekap td:nth-child(2) { left: 50px; min-width: 60px; text-align: center; border-right: 1px solid #ddd; }
+  #tabelRekap th:nth-child(3), #tabelRekap td:nth-child(3) { left: 110px; min-width: 50px; text-align: center; border-right: 1px solid #ddd; }
+  #tabelRekap th:nth-child(4), #tabelRekap td:nth-child(4) { 
+      left: 160px; 
+      min-width: 50px; 
+      text-align: center; 
+      border-right: 2px solid #999; 
+  }
+
+  #tabelRekap thead th.sticky { background-color: var(--blue); z-index: 3; }
+  
+  #tabelRekap tr:nth-child(even) td { background-color: #f8f9fa; }
+  #tabelRekap tr:nth-child(even) td.sticky { background-color: #f8f9fa; }
+  #tabelRekap tr:hover td { background-color: #e3f2fd; }
+  #tabelRekap tr:hover td.sticky { background-color: #e3f2fd; }
+
+  #tabelRekap td:nth-child(n+5) { text-align: right; font-family: 'Consolas', monospace; font-size: 11px; }
+
+  #tabelRekap td:nth-child(5) { background-color: #f0f8ff; font-weight: bold; } 
+  #tabelRekap td:nth-child(6) { background-color: #fff8e1; font-weight: bold; } 
+  #tabelRekap td:nth-child(7) { font-weight: bold; border-right: 2px solid #ccc; } 
+
+  .matrix-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .search-box-matrix { 
+      padding: 8px 12px; 
+      border: 1px solid #ccc; 
+      border-radius: 6px; 
+      width: 300px; 
+      font-size: 13px;
+  }
+
+  #tabelMon { width:100%; border-collapse:collapse; white-space: nowrap; }
+  #tabelMon th { background:#eef3f9; color: var(--blue-dark); font-weight: 600; padding:10px; text-align: left;}
+  #tabelMon td { border-bottom:1px solid #eee; padding:10px; font-size:13px; }
+
+  .charts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 30px; }
+  .chart-card { 
+  background: #fff; 
+  border: 1px solid #eee; 
+  border-radius: 12px; 
+  padding: 15px; 
+  height: 350px; /* Gunakan min-height agar bisa menyesuaikan */ 
+}
+  
+  .select2-container .select2-selection--single { height: 42px !important; padding: 6px; border: 1px solid #ddd; border-radius: 8px; background-color: #fafafa; }
+  .select2-container--default .select2-selection--single .select2-selection__arrow { height: 40px; }
+   
+  .filter-section { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #eee; width: fit-content;}
+  .filter-section label { font-weight: bold; margin: 0; color: var(--blue-dark); }
+  .filter-section select { width: auto; min-width: 120px; margin: 0; }
+  
+  .score-card { text-align: center; padding: 20px; border-radius: 12px; border: 1px solid #eee; background: white; }
+  .score-title { font-size: 13px; color: #666; margin-bottom: 5px; }
+  .score-value { font-size: 22px; font-weight: bold; color: var(--text-dark); }
+
+  #tabel td, #tabel th { padding: 10px; }
+
+  /* HEADER DASHBOARD */
+  .header-banner {
+    background: linear-gradient(90deg, var(--blue) 0%, var(--blue-dark) 100%);
+    padding: 25px 30px 50px 30px; 
+    margin: -30px -30px 30px -30px; 
+    display: flex;
+    justify-content: flex-end; 
+    align-items: center;
+  }
+
+  .user-badge-card {
+    background: white;
+    padding: 10px 20px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    min-width: 200px;
+    justify-content: space-between;
+  }
+
+  .grid { 
+    display:grid; 
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); 
+    gap:25px; 
+    margin-top: -60px; 
+    position: relative;
+    z-index: 2;
+  }
+
+
+</style>
+</head>
+<body>
+<div class="app">
+    <div class="sidebar">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px;">
+            <img src="https://www.bps.go.id/_next/image?url=%2Fassets%2Flogo-bps.png&w=3840&q=75" width="50" style="filter: brightness(0) invert(1);">
+            <div style="text-align: left;">
+                <h2 style="margin: 0; font-size: 24px; line-height: 1.1;">ARUNA</h2>
+                <small style="font-size: 11px; opacity: 0.8; display: block; font-style: italic;">BPS Kota Solok</small>
+            </div>
+        </div>
+        <div class="profile" style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px;">     
+            <div style="font-size: 50px; color: rgba(255,255,255,0.8);"><i class="fas fa-user-circle"></i></div>
+            <div style="line-height: 1.2;">
+                <b style="font-size: 16px; display: block; margin-bottom: 5px;"><?= user.nama ?></b>
+                <span style="font-size: 12px; opacity: 0.9;"><?= user.jabatan ?></span><br>
+                <small style="font-size: 10px; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px;"><?= user.role ?></small>
+            </div>     
+        </div>
+        <div class="menu">
+            <a id="navDash" class="active" onclick="kembali()"><i class="fas fa-home"></i> Dashboard</a>
+            <a id="navInput" onclick="openInputAnggaran()"><i class="fas fa-plus-circle"></i> Rekam Rencana Penarikan Dana</a>
+            <a id="navMon" onclick="openMonitoring()"><i class="fas fa-chart-line"></i> Monitoring Anggaran</a>
+            <? if (user.username === "PPK1372") { ?> 
+                <a id="navUser" onclick="openPanel()"><i class="fas fa-users-cog"></i> Kelola Akun</a> 
+                <a href="https://drive.google.com/drive/folders/1ZqsqK1X-WnS11uH-Xr0CKoCsgkXIj6al?usp=sharing" target="_blank">
+                    <i class="fab fa-google-drive"></i> Google Drive
+                </a>
+            <? } ?>
+            <a class="logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </div>
+
+    <div class="content">
+        
+        <div class="header-banner" id="dashHeader">
+            <div class="user-badge-card">
+                <div style="text-align: right;">
+                    <h3 style="margin: 0; color: var(--blue); font-weight: 700;">HAI, <?= user.nama ?></h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid" id="menuGrid">
+            <div class="card" onclick="openInputAnggaran()">
+                <i class="fas fa-file-invoice-dollar"></i>
+                <h3>Rekam Rencana Penarikan Dana</h3>
+                <p>Ajukan penarikan dana baru</p>
+            </div>
+            
+            <div class="card" onclick="openMonitoring()">
+                <i class="fas fa-chart-pie"></i>
+                <h3>Monitoring Anggaran</h3>
+                <p>Lihat data & grafik</p>
+            </div>
+            
+            <? if (user.username === "PPK1372") { ?>
+                <div class="card" onclick="openPanel()">
+                    <i class="fas fa-users"></i>
+                    <h3>Kelola Akun</h3>
+                    <p>Manajemen user</p>
+                </div>
+                
+                <div class="card" onclick="window.open('https://drive.google.com/drive/folders/1ZqsqK1X-WnS11uH-Xr0CKoCsgkXIj6al?usp=sharing', '_blank')">
+                    <i class="fab fa-google-drive"></i>
+                    <h3>Google Drive</h3>
+                    <p>Akses Google Driver</p>
+                </div>
+            <? } ?>
+
+            <? if (user.username == "PPK1372" || user.username == "BENDAHARA1372") { ?>
+                <div class="card" onclick="alert('Sedang Pengembangan')">
+                    <i class="fas fa-chart-pie"></i>
+                    <h3>Target Minimal Penyerapan RPD</h3>
+                    <p>Target Minimal Penyerapan RPD dan perbandingan</p>
+                </div>
+            <? } ?>
+
+            <? if (user.username == "BENDAHARA1372") { ?>
+                <div class="card" onclick="alert('Sedang Pengembangan')">
+                    <i class="fas fa-chart-pie"></i>
+                    <h3>Realisasi Anggaran</h3>
+                    <p>Input realisasi anggaran</p>
+                </div>
+            <? } ?>
+
+            <div class="card" onclick="alert('Sedang Pengembangan')">
+                <i class="fas fa-chart-pie"></i>
+                <h3>Informasi ARUNA</h3>
+                <p>informasi penggunaan aruna</p>
+            </div>
+        </div>
+
+
+   
+
+        <div class="panel" id="inputAnggaran">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3><i class="fas fa-edit"></i> Rekam Rencana Penarikan Dana</h3><br>
+                <h4><b>*Jika Rencana penarikan diatas tanggal 25, harap Rencana Penarikan Dana (RPD) diisi untuk bulan berikutnya</h4>
+                <? if (user.username === "PPK1372") { ?>
+                  <a href="https://docs.google.com/spreadsheets/d/1nYki_KwwQdPpIlE7A-TOhFO1-jucrwOTmrM3SJnha3o/edit?usp=sharing" target="_blank" style="font-size:11px; color:white; background: #1D6F42; padding: 5px 10px; border-radius: 5px; text-decoration:none;">
+                      <i class="fas fa-edit"></i> Edit Item Kegiatan
+                  </a>
+                <? } ?>
+            </div>
+            <br>
+            <div id="msgInput" class="msg" style="display:none; padding:10px; background:#e8f5e9; color:green; margin-bottom:10px;"></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+                <div>
+                    <label>Nama Penanggung Jawab</label>
+                    <input id="pj" value="<?= user.nama ?>" readonly style="background:#eee; cursor: not-allowed;">
+                    <label>Item Kegiatan</label>
+                    <select id="item" style="width: 100%;">
+                        <option value="" disabled selected>-- Sedang memuat data... --</option>
+                    </select>
+                    <div style="margin-bottom: 15px;"></div> 
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; align-items: end;">
+                        <div>
+                            <label>Bulan Pencairan</label>
+                            <select id="bulan">
+                                <option value="" disabled selected>-- Pilih --</option>
+                                <option value="Januari">Januari</option>
+                                <option value="Februari">Februari</option>
+                                <option value="Maret">Maret</option>
+                                <option value="April">April</option>
+                                <option value="Mei">Mei</option>
+                                <option value="Juni">Juni</option>
+                                <option value="Juli">Juli</option>
+                                <option value="Agustus">Agustus</option>
+                                <option value="September">September</option>
+                                <option value="Oktober">Oktober</option>
+                                <option value="November">November</option>
+                                <option value="Desember">Desember</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Tahun</label>
+                            <input id="tahun" type="number" placeholder="Contoh: 2026">
+                        </div>
+                        <div>
+                             <label>Jumlah (Rp)</label>
+                             <input id="jumlah" type="text" placeholder="0" oninput="formatNumericInput(this)">
+                        </div>
+                        
+                    </div>
+                </div>
+                <div style="display: flex; flex-direction: column;">
+                      <label>Keterangan</label>
+                      <textarea id="ket" style="flex: 1; resize: none; background-color: #fff8e1; border: 1px solid #ffe0b2;" placeholder="Tuliskan detail kegiatan di sini...&#10;(Contoh: Transport lokal profiling sbr kabkot, Honor petugas lapangan SKTNP Jasa tahun 2026, Perjalanan pengawasan kegiatan oleh BPS Kab/kota)"></textarea>
+                  </div>
+
+            </div> 
+            <div class="btn-group" style="margin-top: 20px;">
+                <button class="btn btn-add" onclick="lanjutKonfirmasi()">Lanjut</button>
+                <button class="btn btn-del" onclick="kembali()">Batal</button>
+            </div>
+        </div>
+
+        <div class="panel" id="konfirmasiAnggaran">
+            <h3>Konfirmasi</h3>
+            <div style="background:#f8f9fa; padding:15px; border-radius:8px;">
+                <table>
+                    <tr><td width="150">Nama PJ</td><td id="c_pj"></td></tr>
+                    <tr><td>Item</td><td id="c_item" style="font-weight:bold;"></td></tr>
+                    <tr><td>Waktu</td><td id="c_waktu"></td></tr>
+                    <tr><td>Jumlah</td><td id="c_jumlah" style="font-weight:bold; color:var(--blue)"></td></tr>
+                    <tr><td>Keterangan</td><td id="c_ket"></td></tr>
+                </table>
+            </div><br>
+            <div class="btn-group">
+                <button class="btn btn-add" onclick="simpanFinal()">Simpan</button>
+                <button class="btn btn-del" onclick="batalKonfirmasi()">Kembali</button>
+            </div>
+        </div>
+
+        <div class="panel" id="monitoring">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+                <h3><i class="fas fa-chart-bar"></i> Monitoring</h3>
+                
+                <? if (user.username == "PPK1372") { ?>
+                    <button class="btn" style="background-color: #107c41;" onclick="window.open('https://docs.google.com/spreadsheets/d/1nYki_KwwQdPpIlE7A-TOhFO1-jucrwOTmrM3SJnha3o/edit?usp=sharing', '_blank')">
+                        <i class="fas fa-table"></i> Cek Data (Spreadsheet)
+                    </button>
+                <? } ?>
+            </div>
+
+            <div class="filter-section"> 
+                  <label for="filterTahun"><i class="fas fa-filter"></i> Filter Tahun:</label>
+                <select id="filterTahun">
+                    <option value="">Semua Tahun</option>
+                </select>
+            </div>
+
+            <h3><i class="fas fa-chart-bar"></i> Monitoring Anggaran</h3>
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:15px; margin-bottom:20px;">
+              
+               <div class="score-card">
+                   <div class="score-title">Total Pagu</div>
+                   <div class="score-value" id="valPagu" style="color:var(--blue-dark)">Rp 0</div>
+               </div>
+               <div class="score-card">
+                   <div class="score-title">Total RPD (user PJ)</div>
+                   <div class="score-value" id="valRealisasi" style="color:var(--warning)">Rp 0</div>
+               </div>
+               <div class="score-card">
+                   <div class="score-title">Selisih (SISA)</div>
+                   <div class="score-value" id="valSisa" style="color:var(--success)">Rp 0</div>
+               </div>
+            </div>
+
+            <h3><i class="fas fa-chart-bar"></i> Monitoring Realisasi</h3>
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:15px; margin-bottom:20px;">
+              
+               <div class="score-card">
+                   <div class="score-title">Total RPD</div>
+                   <div class="score-value" id="valRealisasi2" style="color:var(--blue-dark)">Rp 0</div>
+               </div>
+               <div class="score-card">
+                   <div class="score-title">Total Realisasi</div>
+                   <div class="score-value" id="x" style="color:var(--warning)">Rp -</div>
+               </div>
+               <div class="score-card">
+                   <div class="score-title">Selisih (SISA)</div>
+                   <div class="score-value" id="x" style="color:var(--success)">Rp -</div>
+               </div>
+            </div>
+            
+            <div class="table-responsive" style="margin-bottom: 25px; border: 1px solid var(--blue);">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: var(--blue-dark); color: white; font-size: 13px;">
+                            <th style="padding: 10px; text-align: center;">Kode</th>
+                            <th style="padding: 10px; text-align: right;">Total RPD</th>
+                            <th style="padding: 10px; text-align: right;">Total Realisasi</th>
+                            <th style="padding: 10px; text-align: right;">Selisih (Sisa)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodyRingkasanKode">
+                        </tbody>
+                </table>
+            </div>
+
+            <h4 style="margin-bottom: 15px; color: var(--blue-dark); border-bottom: 2px solid #eee; padding-bottom: 8px;">
+                <i class="fas fa-table"></i> Tabel Rencana Penarikan Dana
+            </h4>
+            
+            <div class="matrix-controls">
+                <input type="text" id="searchMatrix" class="search-box-matrix" placeholder="Cari Kode Program / Kegiatan..." onkeyup="searchTableMatrix()">
+                <? if (user.username == "PPK1372" || user.username == "BENDAHARA1372") { ?>
+                    <button class="btn btn-excel" onclick="downloadXLSX()" style="margin-top:0"><i class="fas fa-file-excel"></i> Export Excel (XLSX)</button>
+                <? } ?>
+            </div>
+
+            <div class="table-responsive" style="margin-bottom: 40px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-radius: 8px; max-height: 600px; overflow-y: auto;">
+                <table id="tabelRekap">
+                    <thead>
+                        <tr>
+                            <th class="sticky">Program</th>
+                            <th class="sticky">Kegiatan</th>
+                            <th class="sticky">Output</th>
+                            <th class="sticky">Jenbel</th>
+                            
+                            <th>Pagu</th>
+                            <th>Jumlah RPD</th> 
+                            <th>Sisa Anggaran</th>
+                            
+                            <th>Januari</th>
+                            <th>Februari</th>
+                            <th>Maret</th>
+                            <th>April</th>
+                            <th>Mei</th>
+                            <th>Juni</th>
+                            <th>Juli</th>
+                            <th>Agustus</th>
+                            <th>September</th>
+                            <th>Oktober</th>
+                            <th>November</th>
+                            <th>Desember</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodyRekap">
+                        </tbody>
+                </table>
+            </div>
+
+            <h4 style="margin-bottom: 15px; color: var(--blue-dark); border-bottom: 2px solid #eee; padding-bottom: 8px;">
+                <i class="fas fa-list"></i> Detail Transaksi
+            </h4>
+            <div class="table-responsive" id="printArea">
+                <table id="tabelMon"></table>
+            <div class="charts-grid" style="margin-top:20px;">
+                <div class="chart-card"><h5 style="margin:0 0 10px 0; text-align:center;">Top Item Kegiatan</h5><canvas id="chartItem"></canvas></div>
+                <div class="chart-card"><h5 style="margin:0 0 10px 0; text-align:center;">Trend per Bulan</h5><canvas id="chartBulan"></canvas></div>
+            </div>
+
+            </div>
+            <br><button class="btn btn-del" onclick="kembali()">Tutup</button>
+            </div>
+
+            
+
+
+
+      <div class="panel" id="panel">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                  <h3><i class="fas fa-user-shield"></i> Kelola Akun</h3>
+                  
+                  <button class="btn btn-excel" onclick="window.open('https://docs.google.com/spreadsheets/d/1I_ep09_tnTSqycD_HL6kXXZchhkDYk8tGvcdqRX5Z7U/edit?usp=sharing', '_blank')">
+                      <i class="fas fa-file-excel"></i> Database Akun
+                  </button>
+              </div>
+              <p id="jumlahTxt"></p>
+
+
+
+              
+              <div class="table-responsive"><table id="tabel"></table></div>
+
+            
+              <hr>
+              <h4>Tambah Akun</h4>
+              <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap:10px;">
+                <input id="u" placeholder="Username"><input id="p" placeholder="Password">
+                <input id="n" placeholder="Nama"><input id="j" placeholder="Jabatan">
+                <select id="r"><option value="user">User</option><option value="admin">Admin</option></select>
+            </div>
+              
+              <div style="margin-top: 15px;"> <button class="btn btn-add" onclick="tambah()">Tambah</button>
+                  
+                  <span id="msgSukses" style="display:none; color: #28a745; margin-left: 10px; font-weight: bold;">
+                      <i class="fas fa-check-circle"></i> Akun berhasil dibuat
+                  </span>
+              </div>
+              
+          </div>
+    </div>
+</div>
+
+</div> </div> <div class="footer" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; text-align: right; background-color: rgba(255,255,255,0.9); padding: 10px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+    <span style="display: block; text-align: center; font-size: 14px; font-weight: bold; color: #333;"> Perlu Bantuan?</span>
+    
+    <a href="https://wa.me/6285263663540?text=Halo%20Admin%20ARUNA,%20saya%20butuh%20bantuan." 
+       target="_blank" 
+       class="btn-wa" 
+       style="display: inline-flex; align-items: center; gap: 8px; background-color: #25D366; color: white; text-decoration: none; padding: 8px 15px; font-size: 12px; margin-top: 8px; border-radius: 50px; font-weight: bold;">
+       
+       <svg viewBox="0 0 448 512" style="width: 14px; height: 14px; fill: white;">
+           <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.4 2.8-3.6 5.6-14.1 18-17.2 21.6-3.2 3.6-6.4 4-11.9 1.2-5.5-2.8-23.3-8.6-44.2-27.2-16.3-14.5-27.3-32.4-30.5-37.9-3.2-5.5-.3-8.5 2.5-11.3 2.5-2.5 5.5-6.4 8.3-9.7 2.8-3.3 3.7-5.7 5.5-9.4 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.4-29.8-17-41.1-4.5-10.9-9.1-9.5-12.4-9.7-3.2-.1-6.9-.1-10.6-.1-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 13.2 5.8 23.5 9.2 31.5 11.8 13.3 4.2 25.4 3.6 35 2.2 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/>
+       </svg>
+       Hubungi Admin
+    </a>
+</div>
+
+<script>
+const activeUser = "<?= user.username ?>";
+const activeRole = "<?= user.role ?>"; 
+let chartInstances = {};
+let globalMasterData = []; 
+let globalTotalPagu = 0;
+
+function kembali(){
+  document.querySelectorAll('.panel').forEach(p => p.style.display='none');
+  document.getElementById('menuGrid').style.display='grid';
+  
+  // TAMBAHAN: Munculkan header lagi saat kembali ke dashboard
+  if(document.getElementById('dashHeader')) document.getElementById('dashHeader').style.display='flex'; 
+  
+  document.querySelectorAll('.menu a').forEach(a => a.classList.remove('active'));
+  document.getElementById('navDash').classList.add('active');
+}
+
+function logout(){ google.script.run.withSuccessHandler(h=>{ document.open();document.write(h);document.close(); }).logout(); }
+function numberWithCommas(x){ return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
+function formatNumericInput(el) {
+    // Ambil value asli
+    let value = el.value;
+    
+    // Hapus semua karakter kecuali angka
+    // Ini akan mengubah "4.500" atau "1.000,00" menjadi "4500" atau "100000"
+    let cleanValue = value.replace(/\D/g, "");
+    
+    // Masukkan kembali nilai yang sudah bersih ke input
+    el.value = cleanValue;
+}
+function togglePass(inputId, iconElement){
+    const input = document.getElementById(inputId);
+    if(input.type === "password"){ input.type = "text"; iconElement.className = "fas fa-eye-slash"; iconElement.style.color = "#005bac"; } 
+    else { input.type = "password"; iconElement.className = "fas fa-eye"; iconElement.style.color = "#888"; }
+}
+
+/* --- INPUT LOGIC --- */
+function openInputAnggaran(){ 
+    // 1. Reset tampilan ke mode input
+    kembali(); 
+    document.getElementById('menuGrid').style.display='none'; 
+    document.getElementById('inputAnggaran').style.display='block'; 
+    document.getElementById('tahun').value = new Date().getFullYear();
+
+    // 2. INI BAGIAN PENTING: Memanggil data dari Server (Google Sheet)
+    google.script.run.withSuccessHandler(function(dataItems){
+       const select = document.getElementById('item');
+       
+       // Hapus tulisan "Sedang memuat data..." dan ganti jadi "Pilih Item"
+       select.innerHTML = '<option value="" disabled selected>-- Pilih Item Kegiatan --</option>';
+       
+       // Masukkan data yang didapat ke dalam dropdown
+       dataItems.forEach(function(namaItem){
+           let option = document.createElement('option');
+           option.value = namaItem; option.text = namaItem;
+           select.appendChild(option);
+       });
+       
+       // Refresh Select2 agar data baru terbaca
+       $('#item').trigger('change');
+
+    }).getMasterItems(); // <-- Pastikan fungsi getMasterItems() ada di file .gs (server side)
+
+    // 3. Mengaktifkan fitur pencarian (Select2)
+    setTimeout(function() {
+        if($('#item').length > 0) {
+            $('#item').select2({ placeholder: "-- Ketik untuk mencari Item --", allowClear: true, width: '100%' });
+        }
+    }, 100);
+}
+
+function lanjutKonfirmasi(){
+    const elItem = document.getElementById('item');
+    const elJml = document.getElementById('jumlah');
+    const elBulan = document.getElementById('bulan');
+    const elTahun = document.getElementById('tahun');
+    const elKet = document.getElementById('ket');
+    const elPj = document.getElementById('pj');
+
+    if(!elItem.value || !elJml.value || !elBulan.value || !elTahun.value) {
+        alert("Harap lengkapi: Item, Bulan, Tahun, dan Jumlah!");
+        return;
+    }
+    document.getElementById('c_pj').innerText = elPj.value;
+    document.getElementById('c_item').innerText = elItem.value;
+    document.getElementById('c_waktu').innerText = elBulan.value + " " + elTahun.value; 
+        document.getElementById('c_jumlah').innerText = "Rp " + numberWithCommas(elJml.value); 
+    document.getElementById('c_ket').innerText = elKet.value || "-";
+    document.getElementById('inputAnggaran').style.display = 'none'; 
+    document.getElementById('konfirmasiAnggaran').style.display = 'block';
+}
+
+function batalKonfirmasi(){ 
+    document.getElementById('konfirmasiAnggaran').style.display='none'; 
+    document.getElementById('inputAnggaran').style.display='block'; 
+}
+
+function simpanFinal(){
+    const btn = document.querySelector('#konfirmasiAnggaran .btn-add'); 
+    btn.innerText="Menyimpan..."; btn.disabled=true;
+    
+    const dataKirim = {
+        pj: document.getElementById('pj').value, 
+        item: document.getElementById('item').value,
+        bulan: document.getElementById('bulan').value,
+        tahun: document.getElementById('tahun').value,
+        jumlah: document.getElementById('jumlah').value, 
+        ket: document.getElementById('ket').value
+    };
+
+    google.script.run.withSuccessHandler(()=>{
+        const msg = document.getElementById('msgInput');
+        msg.style.display='block'; msg.innerText="Berhasil disimpan!";
+        $('#item').val(null).trigger('change'); 
+        document.getElementById('jumlah').value=""; 
+        document.getElementById('ket').value=""; 
+        btn.innerText="Simpan"; btn.disabled=false;
+        document.getElementById('konfirmasiAnggaran').style.display='none'; 
+        document.getElementById('inputAnggaran').style.display='block';
+        setTimeout(() => msg.style.display='none', 3000); 
+    }).simpanAnggaran(dataKirim); 
+}
+
+/* --- MONITORING LOGIC --- */
+function openMonitoring(){ 
+    kembali(); 
+    document.getElementById('menuGrid').style.display='none'; 
+    document.getElementById('monitoring').style.display='block'; 
+    loadMonitoring(); 
+}
+
+$('#filterTahun').on('change', function() {
+    var table = $('#tabelMon').DataTable();
+    table.draw(); 
+});
+
+// SEARCH MATRIX TABLE
+function searchTableMatrix() {
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("searchMatrix");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("tabelRekap");
+  tr = table.getElementsByTagName("tr");
+
+  for (i = 1; i < tr.length; i++) {
+    let rowContent = "";
+    for(let j=0; j<4; j++) {
+        let col = tr[i].getElementsByTagName("td")[j];
+        if(col) rowContent += col.textContent || col.innerText;
+    }
+    
+    if (rowContent.toUpperCase().indexOf(filter) > -1) {
+      tr[i].style.display = "";
+    } else {
+      tr[i].style.display = "none";
+    }
+  }
+}
+
+function loadMonitoring(){
+    const tabel = document.getElementById('tabelMon');
+    tabel.innerHTML = '<div style="text-align:center; padding:20px;"><i class="fas fa-spinner fa-spin"></i> Memuat data...</div>';
+    
+    google.script.run.withSuccessHandler(res => {
+        globalMasterData = res.masterItems; 
+        globalTotalPagu = res.totalPagu;
+
+        document.getElementById('valPagu').innerText = "Rp " + numberWithCommas(res.totalPagu);
+        
+        let years = new Set();
+        res.rows.forEach(r => { if(r[4]) years.add(r[4]); });
+
+        let filterSelect = document.getElementById('filterTahun');
+        let currentVal = filterSelect.value;
+        filterSelect.innerHTML = '<option value="">Semua Tahun</option>';
+        
+        Array.from(years).sort().reverse().forEach(y => {
+            let opt = document.createElement('option');
+            opt.value = y; opt.text = y;
+            filterSelect.appendChild(opt);
+        });
+
+        let thisYear = new Date().getFullYear().toString();
+        if(currentVal && years.has(currentVal)) {
+             filterSelect.value = currentVal;
+        } else if (years.has(thisYear)) {
+             filterSelect.value = thisYear;
+        }
+
+        const isMaster = (activeUser === 'PPK1372');
+        const isAdmin = (activeRole === 'admin');
+
+        if ($.fn.DataTable.isDataTable('#tabelMon')) { $('#tabelMon').DataTable().destroy(); }
+
+        let h = `<thead>
+                    <tr>
+                        <th style="display:none;">RawNominal</th>
+                        <th style="display:none;">RawTahun</th>
+                        <th>Tanggal</th> 
+                        <th>PJ</th> 
+                        <th>Item</th>
+                        <th>Bulan</th> 
+                        <th>Tahun</th>
+                        <th>Jumlah (Rp)</th> 
+                        <th>Keterangan</th>      
+                        ${(isMaster||isAdmin) ? '<th>Aksi</th>' : ''}
+                    </tr>
+                 </thead><tbody>`;
+        
+        res.rows.forEach((row, idx) => {
+             let realRowIndex = row[8]; 
+             let rawDate = row[0];
+             let displayDate = rawDate.split("T")[0];
+             let pj = row[1];
+             let item = row[2];
+             let bln = row[3];
+             let thn = row[4];
+             let rawNominal = parseFloat(row[5]) || 0;
+             let ket = row[6] || "-";
+
+             h += `<tr>
+                      <td style="display:none;">${rawNominal}</td>
+                      <td style="display:none;">${thn}</td>
+                      <td><small>${displayDate}</small></td>
+                      <td><small style="font-weight:bold; color:#005bac;">${pj}</small></td>
+                      <td><small>${item}</small></td>
+                      <td>${bln}</td>
+                      <td>${thn}</td>
+                      <td style="text-align:right;">${numberWithCommas(rawNominal)}</td>
+                      <td><small>${ket}</small></td>`;
+             if(isMaster || isAdmin){
+                 h += `<td style="text-align:center;">
+                          <button class="btn-del" style="padding:5px 10px;" onclick="hapusMon(${realRowIndex})"><i class="fas fa-trash"></i></button>
+                        </td>`;
+             }
+             h += `</tr>`;
+        });
+        h += "</tbody>";
+        tabel.innerHTML = h;
+
+        $.fn.dataTable.ext.search.push(
+            function(settings, data, dataIndex) {
+                var selectedYear = $('#filterTahun').val();
+                var rowYear = data[1]; 
+                if (selectedYear === "") return true;
+                return rowYear == selectedYear;
+            }
+        );
+
+        $('#tabelMon').DataTable({
+            "pageLength": 10,
+            "order": [[0, "desc"]], 
+            "drawCallback": function(settings) {
+                updateMatrixAndCharts(this.api()); 
+            }
+        });
+
+    }).getMonitoringData();
+}
+
+// FUNGSI AGREGASI MATRIKS (BY KODE)
+function updateMatrixAndCharts(api) {
+    let bulanData = {}; 
+    let itemTotalData = {}; 
+    let filteredTransactions = []; 
+    let totalFilteredRealisasi = 0; 
+
+    // Objek untuk menampung akumulasi Kode 51 & 52
+    let ringkasanKode = {
+        "51": 0,
+        "52": 0
+    };
+
+    const urutanBulan = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+    urutanBulan.forEach(b => bulanData[b] = 0);
+
+    let rows = api.rows({ search: 'applied' }).nodes();
+
+    rows.each(function(rowNode) {
+        let nom = parseFloat($(rowNode).find('td:eq(0)').text()) || 0; 
+        let itm = $(rowNode).find('td:eq(4)').text(); 
+        let bl = $(rowNode).find('td:eq(5)').text(); 
+
+        itemTotalData[itm] = (itemTotalData[itm] || 0) + nom;
+        if(bulanData[bl] !== undefined) bulanData[bl] += nom;
+        
+        totalFilteredRealisasi += nom;
+        filteredTransactions.push({ item: itm, bulan: bl, nominal: nom });
+
+        // LOGIKA BARU: Ambil kode jenbel (51/52) dari nama item
+        let kode = parseCode(itm).jenbel; // Fungsi parseCode sudah ada di bawah
+        if (ringkasanKode.hasOwnProperty(kode)) {
+            ringkasanKode[kode] += nom;
+        }
+    });
+
+    // RENDER TABEL RINGKASAN KODE
+    let htmlRingkasan = "";
+    ["51", "52"].forEach(k => {
+        htmlRingkasan += `
+            <tr style="font-size: 14px; border-bottom: 1px solid #eee;">
+                <td style="padding: 10px; text-align: center; font-weight: bold; color: var(--blue-dark);">Belanja ${k}</td>
+                <td style="padding: 10px; text-align: right; font-family: monospace;">Rp ${numberWithCommas(ringkasanKode[k])}</td>
+                <td style="padding: 10px; text-align: right; color: #999;">X</td>
+                <td style="padding: 10px; text-align: right; color: #999;">X</td>
+            </tr>`;
+    });
+    document.getElementById('bodyRingkasanKode').innerHTML = htmlRingkasan;
+
+    // UPDATE SEMUA SCORE CARDS
+    // Score cards bagian atas (Monitoring Anggaran)
+    document.getElementById('valRealisasi').innerText = "Rp " + numberWithCommas(totalFilteredRealisasi);
+    document.getElementById('valSisa').innerText = "Rp " + numberWithCommas(globalTotalPagu - totalFilteredRealisasi);
+
+    // Score cards bagian bawah (Monitoring Realisasi) - MENGGUNAKAN ID BARU
+    if(document.getElementById('valRealisasi2')) {
+        document.getElementById('valRealisasi2').innerText = "Rp " + numberWithCommas(totalFilteredRealisasi);
+    }
+
+    renderCharts(itemTotalData, bulanData);
+    renderDetailedMatrix(filteredTransactions);
+}
+
+// Helper Parse Kode: GG.2896.BMA.52-JUDUL
+function parseCode(itemStr) {
+    let splitDash = itemStr.split('-'); 
+    let fullCode = splitDash[0] ? splitDash[0].trim() : ""; 
+    let codeParts = fullCode.split('.');
+    return {
+        fullCode: fullCode,
+        prog: codeParts[0] || "-",
+        keg: codeParts[1] || "-",
+        out: codeParts[2] || "-",
+        jenbel: codeParts[3] || "-"
+    };
+}
+
+// RENDER MATRIKS DETAIL (TANPA AGREGASI, TANPA URAIAN)
+function renderDetailedMatrix(transactions) {
+    const tbody = document.getElementById('bodyRekap');
+    let html = "";
+    
+    // Iterasi Langsung ke Master Data (Setiap baris master = 1 baris tabel)
+    globalMasterData.forEach(master => {
+        let parsed = parseCode(master.name); // Parse Kode
+        let pagu = master.pagu;
+        
+        // Cari transaksi yg sesuai dengan nama item ini
+        let itemTrans = transactions.filter(t => t.item === master.name);
+        
+        let totalReal = 0;
+        let monthsHtml = "";
+        const urutanBulan = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+
+        urutanBulan.forEach(bln => {
+            let sumMonth = itemTrans.filter(t => t.bulan === bln).reduce((a, b) => a + b.nominal, 0);
+            totalReal += sumMonth;
+            
+            let displayVal = sumMonth > 0 ? numberWithCommas(sumMonth) : "0";
+            let color = sumMonth > 0 ? "#000" : "#ccc"; 
+            monthsHtml += `<td style="text-align:right; color:${color};">${displayVal}</td>`;
+        });
+
+        let sisa = pagu - totalReal;
+        let sisaColor = sisa < 0 ? '#e53935' : '#1D6F42';
+
+        html += `<tr>
+            <td class="sticky" style="font-weight:600; color:var(--blue-dark);">${parsed.prog}</td>
+            <td class="sticky">${parsed.keg}</td>
+            <td class="sticky">${parsed.out}</td>
+            <td class="sticky" style="border-right:2px solid #999;">${parsed.jenbel}</td>
+            
+            <td style="text-align:right; background:#f0f8ff;">${numberWithCommas(pagu)}</td>
+            <td style="text-align:right; background:#fff8e1; font-weight:bold;">${numberWithCommas(totalReal)}</td>
+            <td style="text-align:right; font-weight:bold; color:${sisaColor}; border-right:1px solid #ccc;">${numberWithCommas(sisa)}</td>
+            ${monthsHtml}
+        </tr>`;
+    });
+
+    tbody.innerHTML = html;
+}
+
+function renderCharts(itemData, bulanData){
+    let sortedItemKeys = Object.keys(itemData).sort((a,b) => itemData[b] - itemData[a]).slice(0,10);
+    let sortedItemVals = sortedItemKeys.map(k => itemData[k]);
+
+    if(chartInstances['chartItem']) chartInstances['chartItem'].destroy();
+    
+    chartInstances['chartItem'] = new Chart(document.getElementById('chartItem'), {
+        type: 'bar',
+        data: {
+            labels: sortedItemKeys,
+            datasets: [{
+                label: 'Nominal (Rp)', 
+                data: sortedItemVals, 
+                backgroundColor: '#005bac',
+                borderColor: '#003f7d',
+                borderWidth: 1
+            }]
+        },
+        options: { 
+            indexAxis: 'y', 
+            responsive: true, 
+            maintainAspectRatio: false,
+            scales: { x: { beginAtZero: true } }
+        }
+    });
+
+    const urutanBulan = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+    let sortedBulanKeys = urutanBulan; 
+    let sortedBulanVals = sortedBulanKeys.map(k => bulanData[k]);
+    
+    if(chartInstances['chartBulan']) chartInstances['chartBulan'].destroy();
+
+    chartInstances['chartBulan'] = new Chart(document.getElementById('chartBulan'), {
+        type: 'line',
+        data: {
+            labels: sortedBulanKeys,
+            datasets: [{
+                label: 'Nominal (Rp)', 
+                data: sortedBulanVals, 
+                backgroundColor: 'rgba(229, 57, 53, 0.2)',
+                borderColor: '#e53935', 
+                borderWidth: 2, 
+                tension: 0.3, 
+                fill: true
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+}
+
+function hapusMon(rIdx){
+    if(confirm("Yakin ingin menghapus data ini?")) {
+        google.script.run.withSuccessHandler(res => {
+            loadMonitoring(); alert("Data berhasil dihapus!");
+        }).deleteAnggaran(rIdx);
+    }
+}
+
+function downloadXLSX() {
+    var table = document.getElementById("tabelRekap");
+    var rows = table.querySelectorAll("tr");
+    var data = [];
+    var numericColumns = []; // Array untuk menyimpan index kolom angka
+
+    for (var i = 0; i < rows.length; i++) {
+        var row = [];
+        var cols = rows[i].querySelectorAll("td, th");
+        for (var j = 0; j < cols.length; j++) {
+            var text = cols[j].innerText;
+            
+            // Logika: Baris data (>0) dan Kolom Angka (Mulai index 4 ke atas)
+            if (i > 0 && j >= 4) { 
+                // 1. Bersihkan semua karakter KECUALI angka, koma, dan minus
+                //    Ini akan membuang "Rp", spasi, dan titik (ribuan) secara paksa
+                //    Contoh HTML: "1.500.000" -> jadi "1500000"
+                var cleanText = text.replace(/[^\d,-]/g, ""); 
+                
+                // 2. Ganti koma jadi titik (jika ada desimal, misal: 1500,50 -> 1500.50)
+                cleanText = cleanText.replace(",", ".");
+                
+                var number = parseFloat(cleanText);
+                
+                // 3. Push sebagai NUMBER, bukan string
+                row.push(!isNaN(number) ? number : (text.trim() === "-" ? 0 : text));
+            } else {
+                row.push(text);
+            }
+        }
+        data.push(row);
+    }
+
+    var ws = XLSX.utils.aoa_to_sheet(data);
+
+    // --- FITUR TAMBAHAN: AUTO FORMAT NUMBER ---
+    // Agar di Excel angkanya tetap punya titik pemisah ribuan (tapi tetap bisa di-SUM)
+    var range = XLSX.utils.decode_range(ws['!ref']);
+    for (var C = range.s.c; C <= range.e.c; ++C) {
+        for (var R = range.s.r; R <= range.e.r; ++R) {
+            // Terapkan format hanya pada baris data & kolom angka (Index >= 4)
+            if (R > 0 && C >= 4) { 
+                var cell_address = {c: C, r: R};
+                var cell_ref = XLSX.utils.encode_cell(cell_address);
+                if (!ws[cell_ref]) continue;
+                
+                // Format '#,##0' akan mengikuti region Excel user. 
+                // Di PC Indonesia akan jadi 1.500.000, di PC US jadi 1,500,000
+                ws[cell_ref].z = "#,##0"; 
+            }
+        }
+    }
+    // ------------------------------------------
+
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Laporan Realisasi");
+
+    var selectedYear = document.getElementById('filterTahun').value || "SemuaTahun";
+    var fileName = 'Laporan_Realisasi_' + selectedYear + '.xlsx';
+    XLSX.writeFile(wb, fileName);
+}
+
+
+
+// ==========================================
+// 6. KELOLA AKUN
+// ==========================================
+function openPanel(){ kembali(); document.getElementById('menuGrid').style.display='none'; document.getElementById('panel').style.display='block'; loadUser(); }
+
+function loadUser(){
+    google.script.run.withSuccessHandler(d => {
+        let h = `<thead>
+                    <tr>
+                        <th style="width: 15%;">User</th>
+                        <th style="width: 10%;">Password</th>
+                        <br>
+                        <th>Nama</th>
+                        <th>Jabatan</th>
+                        <th style="width: 10%; text-align: center;">Role</th>
+                        <th style="width: 80px; text-align:center;">Kirim</th>
+                        <th style="width: 80px; text-align:center;">Hapus</th>
+                    </tr>
+                 </thead><tbody>`;
+                 
+        for(let i = 1; i < d.length; i++){
+            let isMasterAccount = (d[i][0] === "PPK1372");
+            let username = d[i][0], password = d[i][1], nama = d[i][2], jabatan = d[i][3];
+            
+            let subject = encodeURIComponent(`Info Akun ARUNA BPS Kota Solok - ${nama}`);
+            let bodyPesan = encodeURIComponent(
+              `Halo ${nama},\n\n` + 
+              `Berikut adalah akun login ARUNA BPS Kota Solok Anda:\n\n` +
+              `Nama: ${nama}\n` +
+              `Jabatan: ${jabatan}\n` +
+              `Username: ${username}\n` +
+              `Password: ${password}\n\n` +
+              
+              `Berikut adalah link akses: s.id/ARUNA1372\n\n`+
+              `Harap segera login dan simpan dengan baik akun Anda. Jika terdapat kendala ataupun perlu bantuan harap hubungi admin ARUNA.\n\n` +
+              `Sekian, terima kasih.\n` +
+              `Tertanda Admin ARUNA,\n` +
+              `\n` +
+              `Nurhafizah, A.Md.,S.M.\n` +
+              `APK APBN BPS Kota Solok`
+              );
+            let gmailLink = `https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${bodyPesan}`;
+
+            h += `<tr>
+                <td>${username}</td>
+                <td>
+                    <div style="display:flex; align-items:center;">
+                        
+                        <input type="password" id="p_in_${i}" value="${password}" readonly style="border:none; background:transparent; flex:1; width:200px; color:#555;">
+                        <i class="fas fa-eye" onclick="togglePass('p_in_${i}', this)" style="cursor:pointer; color:#888; font-size:12px; margin-left:5px;"></i>
+                    </div>
+                </td>
+                <td>${nama}</td>
+                <td>${jabatan}</td> 
+                <td>${d[i][4]}</td>`;
+
+            if (isMasterAccount) {
+                h += `<td colspan="2" style="text-align:center; color:#ccc;">- Master -</td>`;
+            } else {
+                h += `<td style="text-align:center;">
+                        <button class="btn-save-inline" style="background:#25D366;" onclick="window.open('${gmailLink}', '_blank')"><i class="fas fa-paper-plane"></i></button>
+                      </td>
+                      <td id="aksi_cell_${i}" style="text-align:center;">
+                        <button class="btn-del" onclick="tanyaHapus('${username}', ${i})"><i class="fas fa-trash"></i></button>
+                      </td>`;
+            }
+            h += `</tr>`;
+        }
+        document.getElementById('tabel').innerHTML = h + "</tbody>";
+        document.getElementById('jumlahTxt').innerText = "Total akun: " + (d.length - 1);
+    }).getAllUsers();
+}
+
+function tanyaHapus(username, index){
+    document.getElementById(`aksi_cell_${index}`).innerHTML = `
+        <div style="display:flex; gap:2px;">
+            <button class="btn-save-inline" style="background:#c62828; font-size:10px;" onclick="eksekusiHapus('${username}')">Ya</button>
+            <button class="btn-cancel-inline" style="font-size:10px;" onclick="loadUser()">Batal</button>
+        </div>`;
+}
+
+function eksekusiHapus(username){
+    google.script.run.withSuccessHandler(loadUser).deleteUser(username);
+}
+
+function tambah(){ 
+    google.script.run.withSuccessHandler(loadUser).addUser({
+        username:document.getElementById('u').value, 
+        password:document.getElementById('p').value, 
+        nama:document.getElementById('n').value, 
+        jabatan:document.getElementById('j').value, 
+        role:document.getElementById('r').value
+    }); 
+}
+</script>
+</body>
+</html>
