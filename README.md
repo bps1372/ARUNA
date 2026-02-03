@@ -1,8 +1,2 @@
 # ARUNA
-
-
-
-<img height="350" alt="image" src="https://github.com/user-attachments/assets/68cbf781-3368-4e6a-a730-cd280b3fdd1c" />
-
-
-*link appscript HTML, masih memungkinkan nanti berubah.... karena masih develop
+Update V1.31 : s.id/aruna-v1-31
