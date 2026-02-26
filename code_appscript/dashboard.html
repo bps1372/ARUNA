@@ -1,8 +1,9 @@
-
 <!-- Keterangan Data -->
 <!-- valRealisasi dan valrealisasi2: data total RPD (inputanuser)-->
 <!-- valpagu: data total pagu-->
 <!-- valSisa: data selisih (TOTAL RPD - TOTAL PAGU)--> 
+
+
 
 
 <? var user = getUser(); ?>
@@ -20,7 +21,6 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <style>
@@ -213,6 +213,85 @@
     z-index: 2;
   }
 
+/* Style Modal Edit */
+.modal-overlay {
+  display: none; position: fixed; z-index: 9999; left: 0; top: 0;
+  width: 100%; height: 100%; overflow: auto; 
+  background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center;
+}
+.modal-box {
+  background-color: #fefefe; margin: 10% auto; padding: 20px; border-radius: 10px;
+  border: 1px solid #888; width: 90%; max-width: 500px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2); animation: fadeIn 0.3s;
+}
+.modal-header { font-size: 18px; font-weight: bold; margin-bottom: 15px; color: var(--blue-dark); border-bottom: 1px solid #eee; padding-bottom: 10px;}
+.close-btn { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 20px;}
+.close-btn:hover { color: black; }
+/* --- STYLE NOTIFIKASI SUKSES (M-BANKING STYLE) --- */
+.success-box {
+  background: white;
+  width: 90%;
+  max-width: 320px;
+  padding: 30px 20px;
+  border-radius: 20px; /* Sudut membulat khas aplikasi mobile */
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Efek membal saat muncul */
+}
+
+.success-icon-circle {
+  width: 70px;
+  height: 70px;
+  background: #25D366; /* Warna Hijau WA/Sukses */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px auto;
+  box-shadow: 0 5px 15px rgba(37, 211, 102, 0.4);
+}
+
+.success-icon-circle i {
+  color: white;
+  font-size: 30px;
+}
+
+.success-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.success-desc {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 25px;
+  line-height: 1.5;
+}
+
+.btn-success-close {
+  background: #f4f7fb;
+  color: #333;
+  border: none;
+  padding: 12px 0;
+  width: 100%;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-success-close:hover {
+  background: #e0e0e0;
+}
+
+@keyframes popUp {
+  0% { transform: scale(0.5); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+
 
 </style>
 </head>
@@ -316,9 +395,9 @@
                 <h3><i class="fas fa-edit"></i> Rekam Rencana Penarikan Dana</h3><br>
                 <h4><b>*Jika Rencana penarikan diatas tanggal 25, harap Rencana Penarikan Dana (RPD) diisi untuk bulan berikutnya</h4>
                 <? if (user.username === "PPK1372") { ?>
-                  <a href="https://docs.google.com/spreadsheets/d/1nYki_KwwQdPpIlE7A-TOhFO1-jucrwOTmrM3SJnha3o/edit?usp=sharing" target="_blank" style="font-size:11px; color:white; background: #1D6F42; padding: 5px 10px; border-radius: 5px; text-decoration:none;">
-                      <i class="fas fa-edit"></i> Edit Item Kegiatan
-                  </a>
+                    <button onclick="openMasterItemPanel()" style="font-size:11px; color:white; background: #1D6F42; padding: 5px 10px; border-radius: 5px; border:none; cursor:pointer;">
+                        <i class="fas fa-edit"></i> Edit Item Kegiatan
+                    </button>
                 <? } ?>
             </div>
             <br>
@@ -391,129 +470,183 @@
             </div>
         </div>
 
+
+
+        <div class="panel" id="panelMasterItem">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+        <h3><i class="fas fa-database"></i> Kelola Master Item</h3>
+        <button class="btn btn-add" onclick="bukaModalMaster('', '', '')"><i class="fas fa-plus"></i> Tambah Item</button>
+    </div>
+    <div style="background-color: #fff3cd; padding: 10px; border-radius: 5px; font-size: 12px; margin-bottom: 20px; border: 1px solid #ffeeba; color: #856404;">
+        <strong><i class="fas fa-info-circle"></i> KETENTUAN FORMAT:</strong><br>
+        Gunakan pemisah titik (.) dan tanda hubung (-) dengan benar.<br>
+        Contoh Benar: <b>WA.2886.EBD.52-Layanan Reformasi Kinerja</b>
+    </div>
+    <div class="table-responsive">
+        <table id="tabelMaster" class="display" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Nama Item Kegiatan</th>
+                    <th style="text-align:right;">Pagu Anggaran</th>
+                    <th style="text-align:center;">Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="bodyMasterItem"></tbody>
+        </table>
+    </div>
+    <br><button class="btn btn-del" onclick="kembaliKeInput()">Kembali</button>
+</div>
+
+<div id="modalMasterEdit" class="modal-overlay">
+  <div class="modal-box">
+    <span class="close-btn" onclick="tutupModalMaster()">&times;</span>
+    <div class="modal-header"><i class="fas fa-pen-square"></i> Form Master Item</div>
+    <input type="hidden" id="master_rowIndex">
+    <label>Nama Item Kegiatan</label>
+    <textarea id="master_item" rows="3" placeholder="Contoh: WA.2886.EBD.52-Nama Item"></textarea>
+    <small style="color:gray; display:block; margin-bottom:10px;">*Format: Program.Kegiatan.Output.Jenbel-Item  <br>Ex: WA.2886.EBD.52-Publikasi Statistik XYZ</small>
+    <label>Pagu Anggaran (Rp)</label>
+    <input type="text" id="master_pagu" oninput="formatNumericInput(this)" placeholder="0">
+    <div style="text-align:right; margin-top:15px;">
+      <button class="btn btn-del" onclick="tutupModalMaster()">Batal</button>
+      <button class="btn btn-add" onclick="simpanMasterItem()">Simpan</button>
+    </div>
+  </div>
+</div>
+
         <div class="panel" id="monitoring">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
-                <h3><i class="fas fa-chart-bar"></i> Monitoring</h3>
-                
-                <? if (user.username == "PPK1372") { ?>
-                    <button class="btn" style="background-color: #107c41;" onclick="window.open('https://docs.google.com/spreadsheets/d/1nYki_KwwQdPpIlE7A-TOhFO1-jucrwOTmrM3SJnha3o/edit?usp=sharing', '_blank')">
-                        <i class="fas fa-table"></i> Cek Data (Spreadsheet)
-                    </button>
-                <? } ?>
-            </div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+        <h3><i class="fas fa-chart-bar"></i> Monitoring</h3>
+        
+        <? if (user.username == "PPK1372") { ?>
+            <button class="btn" style="background-color: #107c41;" onclick="window.open('https://docs.google.com/spreadsheets/d/1nYki_KwwQdPpIlE7A-TOhFO1-jucrwOTmrM3SJnha3o/edit?usp=sharing', '_blank')">
+                <i class="fas fa-table"></i> Cek Data (Spreadsheet)
+            </button>
+        <? } ?>
+    </div>
 
-            <div class="filter-section"> 
-                  <label for="filterTahun"><i class="fas fa-filter"></i> Filter Tahun:</label>
-                <select id="filterTahun">
-                    <option value="">Semua Tahun</option>
-                </select>
-            </div>
+    <div class="filter-section"> 
+          <label for="filterTahun"><i class="fas fa-filter"></i> Filter:</label>
+          <select id="filterTahun">
+              <option value="">Semua Tahun</option>
+          </select>
+          <select id="filterBulan">
+              <option value="">Semua Bulan</option>
+              <option value="Januari">Januari</option>
+              <option value="Februari">Februari</option>
+              <option value="Maret">Maret</option>
+              <option value="April">April</option>
+              <option value="Mei">Mei</option>
+              <option value="Juni">Juni</option>
+              <option value="Juli">Juli</option>
+              <option value="Agustus">Agustus</option>
+              <option value="September">September</option>
+              <option value="Oktober">Oktober</option>
+              <option value="November">November</option>
+              <option value="Desember">Desember</option>
+          </select>
+      </div>
 
-            <h3><i class="fas fa-chart-bar"></i> Monitoring Anggaran</h3>
-            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:15px; margin-bottom:20px;">
-              
-               <div class="score-card">
-                   <div class="score-title">Total Pagu</div>
-                   <div class="score-value" id="valPagu" style="color:var(--blue-dark)">Rp 0</div>
-               </div>
-               <div class="score-card">
-                   <div class="score-title">Total RPD (user PJ)</div>
-                   <div class="score-value" id="valRealisasi" style="color:var(--warning)">Rp 0</div>
-               </div>
-               <div class="score-card">
-                   <div class="score-title">Selisih (SISA)</div>
-                   <div class="score-value" id="valSisa" style="color:var(--success)">Rp 0</div>
-               </div>
-            </div>
+    <h3><i class="fas fa-chart-bar"></i> Monitoring Anggaran</h3>
+    <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:15px; margin-bottom:20px;">
+      
+       <div class="score-card">
+           <div class="score-title">Total Pagu</div>
+           <div class="score-value" id="valPagu" style="color:var(--blue-dark)">Rp 0</div>
+       </div>
+       <div class="score-card">
+           <div class="score-title">Total RPD (user PJ)</div>
+           <div class="score-value" id="valRealisasi" style="color:var(--warning)">Rp 0</div>
+       </div>
+       <div class="score-card">
+           <div class="score-title">Selisih (SISA)</div>
+           <div class="score-value" id="valSisa" style="color:var(--success)">Rp 0</div>
+       </div>
+    </div>
 
-            <h3><i class="fas fa-chart-bar"></i> Monitoring Realisasi</h3>
-            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:15px; margin-bottom:20px;">
-              
-               <div class="score-card">
-                   <div class="score-title">Total RPD</div>
-                   <div class="score-value" id="valRealisasi2" style="color:var(--blue-dark)">Rp 0</div>
-               </div>
-               <div class="score-card">
-                   <div class="score-title">Total Realisasi</div>
-                   <div class="score-value" id="x" style="color:var(--warning)">Rp -</div>
-               </div>
-               <div class="score-card">
-                   <div class="score-title">Selisih (SISA)</div>
-                   <div class="score-value" id="x" style="color:var(--success)">Rp -</div>
-               </div>
-            </div>
-            
-            <div class="table-responsive" style="margin-bottom: 25px; border: 1px solid var(--blue);">
-                <table style="width: 100%; border-collapse: collapse;">
-                    <thead>
-                        <tr style="background: var(--blue-dark); color: white; font-size: 13px;">
-                            <th style="padding: 10px; text-align: center;">Kode</th>
-                            <th style="padding: 10px; text-align: right;">Total RPD</th>
-                            <th style="padding: 10px; text-align: right;">Total Realisasi</th>
-                            <th style="padding: 10px; text-align: right;">Selisih (Sisa)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="bodyRingkasanKode">
-                        </tbody>
-                </table>
-            </div>
+    <h3><i class="fas fa-chart-bar"></i> Monitoring Realisasi</h3>
+    <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:15px; margin-bottom:20px;">
+      
+       <div class="score-card">
+           <div class="score-title">Total RPD</div>
+           <div class="score-value" id="valRealisasi2" style="color:var(--blue-dark)">Rp 0</div>
+       </div>
+       <div class="score-card">
+           <div class="score-title">Total Realisasi</div>
+           <div class="score-value" id="x" style="color:var(--warning)">Rp -</div>
+       </div>
+       <div class="score-card">
+           <div class="score-title">Selisih (SISA)</div>
+           <div class="score-value" id="x" style="color:var(--success)">Rp -</div>
+       </div>
+    </div>
+    
+    <div class="table-responsive" style="margin-bottom: 35px; border: 1px solid var(--blue);">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: var(--blue-dark); color: white; font-size: 13px;">
+                    <th style="padding: 10px; text-align: center;">Kode</th>
+                    <th style="padding: 10px; text-align: right;">Total RPD</th>
+                    <th style="padding: 10px; text-align: right;">Total Realisasi</th>
+                    <th style="padding: 10px; text-align: right;">Selisih (Sisa)</th>
+                </tr>
+            </thead>
+            <tbody id="bodyRingkasanKode">
+            </tbody>
+        </table>
+    </div>
 
-            <h4 style="margin-bottom: 15px; color: var(--blue-dark); border-bottom: 2px solid #eee; padding-bottom: 8px;">
-                <i class="fas fa-table"></i> Tabel Rencana Penarikan Dana
-            </h4>
-            
-            <div class="matrix-controls">
-                <input type="text" id="searchMatrix" class="search-box-matrix" placeholder="Cari Kode Program / Kegiatan..." onkeyup="searchTableMatrix()">
-                <? if (user.username == "PPK1372" || user.username == "BENDAHARA1372") { ?>
-                    <button class="btn btn-excel" onclick="downloadXLSX()" style="margin-top:0"><i class="fas fa-file-excel"></i> Export Excel (XLSX)</button>
-                <? } ?>
-            </div>
+    <h4 style="margin-bottom: 15px; color: var(--blue-dark); border-bottom: 2px solid #eee; padding-bottom: 8px;">
+        <i class="fas fa-list"></i> Detail Transaksi
+    </h4>
+    <div class="table-responsive" id="printArea" style="margin-bottom: 50px;">
+        <table id="tabelMon"></table>
+    </div>
+    <h4 style="margin-bottom: 15px; color: var(--blue-dark); border-bottom: 2px solid #eee; padding-bottom: 8px;">
+        <i class="fas fa-table"></i> Tabel Rencana Penarikan Dana
+    </h4>
+    
+    <div class="matrix-controls">
+        <input type="text" id="searchMatrix" class="search-box-matrix" placeholder="Cari Kode Program / Kegiatan..." onkeyup="searchTableMatrix()">
+        <? if (user.username == "PPK1372" || user.username == "BENDAHARA1372") { ?>
+            <button class="btn btn-excel" onclick="downloadXLSX()" style="margin-top:0"><i class="fas fa-file-excel"></i> Export Excel (XLSX)</button>
+        <? } ?>
+    </div>
 
-            <div class="table-responsive" style="margin-bottom: 40px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-radius: 8px; max-height: 600px; overflow-y: auto;">
-                <table id="tabelRekap">
-                    <thead>
-                        <tr>
-                            <th class="sticky">Program</th>
-                            <th class="sticky">Kegiatan</th>
-                            <th class="sticky">Output</th>
-                            <th class="sticky">Jenbel</th>
-                            
-                            <th>Pagu</th>
-                            <th>Jumlah RPD</th> 
-                            <th>Sisa Anggaran</th>
-                            
-                            <th>Januari</th>
-                            <th>Februari</th>
-                            <th>Maret</th>
-                            <th>April</th>
-                            <th>Mei</th>
-                            <th>Juni</th>
-                            <th>Juli</th>
-                            <th>Agustus</th>
-                            <th>September</th>
-                            <th>Oktober</th>
-                            <th>November</th>
-                            <th>Desember</th>
-                        </tr>
-                    </thead>
-                    <tbody id="bodyRekap">
-                        </tbody>
-                </table>
-            </div>
+    <div class="table-responsive" style="margin-bottom: 40px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-radius: 8px; max-height: 600px; overflow-y: auto;">
+        <table id="tabelRekap">
+            <thead>
+                <tr>
+                    <th class="sticky">Program</th>
+                    <th class="sticky">Kegiatan</th>
+                    <th class="sticky">Output</th>
+                    <th class="sticky">Jenbel</th>
+                    
+                    <th>Pagu</th>
+                    <th>Jumlah RPD</th> 
+                    <th>Sisa Anggaran</th>
+                    
+                    <th>Januari</th>
+                    <th>Februari</th>
+                    <th>Maret</th>
+                    <th>April</th>
+                    <th>Mei</th>
+                    <th>Juni</th>
+                    <th>Juli</th>
+                    <th>Agustus</th>
+                    <th>September</th>
+                    <th>Oktober</th>
+                    <th>November</th>
+                    <th>Desember</th>
+                </tr>
+            </thead>
+            <tbody id="bodyRekap">
+                </tbody>
+        </table>
+    </div>
 
-            <h4 style="margin-bottom: 15px; color: var(--blue-dark); border-bottom: 2px solid #eee; padding-bottom: 8px;">
-                <i class="fas fa-list"></i> Detail Transaksi
-            </h4>
-            <div class="table-responsive" id="printArea">
-                <table id="tabelMon"></table>
-            <div class="charts-grid" style="margin-top:20px;">
-                <div class="chart-card"><h5 style="margin:0 0 10px 0; text-align:center;">Top Item Kegiatan</h5><canvas id="chartItem"></canvas></div>
-                <div class="chart-card"><h5 style="margin:0 0 10px 0; text-align:center;">Trend per Bulan</h5><canvas id="chartBulan"></canvas></div>
-            </div>
-
-            </div>
-            <br><button class="btn btn-del" onclick="kembali()">Tutup</button>
-            </div>
+    <br><button class="btn btn-del" onclick="kembali()">Tutup</button>
+</div>
 
             
 
@@ -529,12 +662,8 @@
               </div>
               <p id="jumlahTxt"></p>
 
-
-
-              
               <div class="table-responsive"><table id="tabel"></table></div>
-
-            
+           
               <hr>
               <h4>Tambah Akun</h4>
               <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap:10px;">
@@ -569,76 +698,254 @@
     </a>
 </div>
 
+<div id="modalEdit" class="modal-overlay">
+  <div class="modal-box">
+    <span class="close-btn" onclick="tutupEdit()">&times;</span>
+    <div class="modal-header"><i class="fas fa-edit"></i> Edit RPD</div>
+    
+    <input type="hidden" id="edit_rowIndex"> <label>Item Kegiatan</label>
+    <select id="edit_item" style="width:100%; margin-bottom:10px; border:1px solid #ccc; padding:8px; border-radius:5px;"></select>
+    
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+      <div>
+        <label>Bulan</label>
+        <select id="edit_bulan">
+             <option value="Januari">Januari</option><option value="Februari">Februari</option>
+             <option value="Maret">Maret</option><option value="April">April</option>
+             <option value="Mei">Mei</option><option value="Juni">Juni</option>
+             <option value="Juli">Juli</option><option value="Agustus">Agustus</option>
+             <option value="September">September</option><option value="Oktober">Oktober</option>
+             <option value="November">November</option><option value="Desember">Desember</option>
+        </select>
+      </div>
+      <div>
+        <label>Tahun</label>
+        <input type="number" id="edit_tahun">
+      </div>
+    </div>
+
+    <label>Jumlah (Rp)</label>
+    <input type="text" id="edit_jumlah" oninput="formatNumericInput(this)">
+
+    <label>Keterangan</label>
+    <textarea id="edit_ket" rows="3" style="width:100%; resize:none; border:1px solid #ccc; border-radius:5px; padding:8px;"></textarea>
+
+    <div style="text-align:right; margin-top:15px;">
+      <button class="btn btn-del" onclick="tutupEdit()">Batal</button>
+      <button class="btn btn-add" onclick="simpanPerubahan()">Simpan Perubahan</button>
+    </div>
+  </div>
+</div>
+
+<div id="modalSuccess" class="modal-overlay" style="z-index: 10001;">
+  <div class="success-box">
+    <div class="success-icon-circle">
+      <i class="fas fa-check"></i>
+    </div>
+    
+    <div class="success-title">Berhasil!</div>
+    <div class="success-desc">Data berhasil diupdate dan diperbarui</div>
+    
+    <button class="btn-success-close" onclick="tutupSuccess()">Tutup</button>
+  </div>
+</div>
+
+<div id="modalConfirmDelete" class="modal-overlay" style="z-index: 10002;">
+  <div class="success-box">
+    <div class="success-icon-circle" style="background: #e53935;">
+      <i class="fas fa-exclamation-triangle"></i>
+    </div>
+    <div class="success-title">Hapus Data?</div>
+    <div class="success-desc">Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.</div>
+    
+    <div style="display: flex; gap: 10px; margin-top: 20px;">
+      <button class="btn-success-close" style="background: #e53935; color: white;" id="btnYaHapus">Ya, Hapus</button>
+      <button class="btn-success-close" onclick="tutupConfirmDelete()">Batal</button>
+    </div>
+  </div>
+</div>
+
+
+<div id="modalEditRealisasi" class="modal-overlay">
+  <div class="modal-box">
+    <span class="close-btn" onclick="tutupEditRealisasi()">&times;</span>
+    <div class="modal-header"><i class="fas fa-money-bill-wave"></i> Input Realisasi</div>
+    
+    <input type="hidden" id="real_rowIndex">
+    
+    <div style="background: #f8f9fa; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 12px;">
+        <strong>Item:</strong> <span id="real_info_item"></span><br>
+        <strong>RPD Diajukan:</strong> <span id="real_info_rpd" style="color: var(--blue); font-weight: bold;"></span>
+    </div>
+
+    <label>Jumlah Realisasi (Rp)</label>
+    <input type="text" id="real_jumlah" oninput="formatNumericInput(this)" placeholder="Masukkan nilai realisasi...">
+
+    <div style="text-align:right; margin-top:15px;">
+      <button class="btn btn-del" onclick="tutupEditRealisasi()">Batal</button>
+      <button class="btn btn-add" onclick="simpanRealisasi()">Simpan Realisasi</button>
+    </div>
+  </div>
+</div>
+
 <script>
+// --- VARIABEL GLOBAL ---
 const activeUser = "<?= user.username ?>";
 const activeRole = "<?= user.role ?>"; 
 let chartInstances = {};
 let globalMasterData = []; 
 let globalTotalPagu = 0;
+let globalRowData = []; 
+let tempRowIndex = null; // Variabel penting untuk hapus
 
+// --- FUNGSI NAVIGASI ---
 function kembali(){
   document.querySelectorAll('.panel').forEach(p => p.style.display='none');
   document.getElementById('menuGrid').style.display='grid';
-  
-  // TAMBAHAN: Munculkan header lagi saat kembali ke dashboard
   if(document.getElementById('dashHeader')) document.getElementById('dashHeader').style.display='flex'; 
-  
   document.querySelectorAll('.menu a').forEach(a => a.classList.remove('active'));
   document.getElementById('navDash').classList.add('active');
 }
 
 function logout(){ google.script.run.withSuccessHandler(h=>{ document.open();document.write(h);document.close(); }).logout(); }
 function numberWithCommas(x){ return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
+
 function formatNumericInput(el) {
-    // Ambil value asli
     let value = el.value;
-    
-    // Hapus semua karakter kecuali angka
-    // Ini akan mengubah "4.500" atau "1.000,00" menjadi "4500" atau "100000"
     let cleanValue = value.replace(/\D/g, "");
-    
-    // Masukkan kembali nilai yang sudah bersih ke input
     el.value = cleanValue;
 }
+
 function togglePass(inputId, iconElement){
     const input = document.getElementById(inputId);
     if(input.type === "password"){ input.type = "text"; iconElement.className = "fas fa-eye-slash"; iconElement.style.color = "#005bac"; } 
     else { input.type = "password"; iconElement.className = "fas fa-eye"; iconElement.style.color = "#888"; }
 }
 
-/* --- INPUT LOGIC --- */
+
+/* --- LOGIC MASTER ITEM (Baru) --- */
+function openMasterItemPanel() {
+    document.querySelectorAll('.panel').forEach(p => p.style.display='none');
+    document.getElementById('inputAnggaran').style.display='none'; 
+    document.getElementById('panelMasterItem').style.display='block';
+    loadMasterTable();
+}
+
+function kembaliKeInput() {
+    document.getElementById('panelMasterItem').style.display='none';
+    document.getElementById('inputAnggaran').style.display='block';
+}
+
+function loadMasterTable() {
+    // 1. Ambil elemen body tabel
+    const tbody = document.getElementById('bodyMasterItem');
+    
+    // 2. Tampilkan animasi loading agar user tahu proses sedang berjalan
+    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px;"><i class="fas fa-spinner fa-spin"></i> Memuat data terbaru...</td></tr>';
+
+    google.script.run.withSuccessHandler(data => {
+        let html = "";
+        
+        // Hancurkan DataTable lama sebelum membuat yang baru
+        if ($.fn.DataTable.isDataTable('#tabelMaster')) { 
+            $('#tabelMaster').DataTable().destroy(); 
+        }
+
+        if (!data || data.length === 0) {
+            // Jika data kosong dari server
+            html = '<tr><td colspan="3" style="text-align:center; padding:20px; color:red;">Harap Refresh Halaman website ini</td></tr>';
+        } else {
+            data.forEach((row) => {
+                let safeItem = row.item.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                html += `<tr>
+                    <td style="font-size:12px;">${row.item}</td>
+                    <td style="text-align:right;">Rp ${numberWithCommas(row.pagu)}</td>
+                    <td style="text-align:center;">
+                        <button class="btn-save-inline" onclick="bukaModalMaster('${row.rowIndex}', '${safeItem}', '${row.pagu}')">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    </td>
+                </tr>`;
+            });
+        }
+        
+        tbody.innerHTML = html;
+        
+        // Inisialisasi DataTable dengan pesan kustom
+        if (data && data.length > 0) { 
+            $('#tabelMaster').DataTable({ 
+                "pageLength": 10, 
+                "language": { 
+                    "search": "Cari Item:",
+                    "zeroRecords": "Harap Refresh Halaman website ini", // Pesan jika hasil pencarian kosong
+                    "infoEmpty": "Tidak ada data tersedia",
+                } 
+            }); 
+        }
+    }).getMasterItemData();
+}
+
+function bukaModalMaster(index, nama, pagu) {
+    document.getElementById('master_rowIndex').value = (index === '') ? '' : index; 
+    document.getElementById('master_item').value = nama || '';
+    document.getElementById('master_pagu').value = pagu ? numberWithCommas(pagu) : '';
+    document.getElementById('modalMasterEdit').style.display = 'flex';
+}
+
+function tutupModalMaster() { document.getElementById('modalMasterEdit').style.display = 'none'; }
+
+function simpanMasterItem() {
+    const itemVal = document.getElementById('master_item').value;
+    const paguVal = document.getElementById('master_pagu').value.replace(/\./g, ""); 
+    const rowIndex = document.getElementById('master_rowIndex').value;
+
+    if(itemVal.trim() === "" || paguVal === "") { alert("Data tidak boleh kosong!"); return; }
+    
+    // MODAL KONFIRMASI
+    let konfirmasi = confirm("Item dan Pagu yang edit sudah benar? jika sudah simpan");
+    if (!konfirmasi) return;
+
+    const btn = document.querySelector('#modalMasterEdit .btn-add');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...'; 
+    btn.disabled = true;
+
+    google.script.run.withSuccessHandler(res => {
+        btn.innerHTML = 'Simpan'; btn.disabled = false;
+        if (res.status === 'success') {
+            tutupModalMaster();
+            document.querySelector('#modalSuccess .success-title').innerText = "Berhasil Update!";
+            document.getElementById('modalSuccess').style.display = 'flex';
+            loadMasterTable(); // Refresh otomatis
+        } else {
+            alert("Gagal: " + res.message);
+        }
+    }).saveMasterItemData({ rowIndex: rowIndex, item: itemVal, pagu: paguVal });
+}
+
+
+/* --- INPUT ANGGARAN --- */
 function openInputAnggaran(){ 
-    // 1. Reset tampilan ke mode input
     kembali(); 
     document.getElementById('menuGrid').style.display='none'; 
     document.getElementById('inputAnggaran').style.display='block'; 
     document.getElementById('tahun').value = new Date().getFullYear();
 
-    // 2. INI BAGIAN PENTING: Memanggil data dari Server (Google Sheet)
+    // Memuat Item Kegiatan (Fungsi ini skrg SUDAH ADA di code.gs)
     google.script.run.withSuccessHandler(function(dataItems){
        const select = document.getElementById('item');
-       
-       // Hapus tulisan "Sedang memuat data..." dan ganti jadi "Pilih Item"
        select.innerHTML = '<option value="" disabled selected>-- Pilih Item Kegiatan --</option>';
-       
-       // Masukkan data yang didapat ke dalam dropdown
        dataItems.forEach(function(namaItem){
            let option = document.createElement('option');
            option.value = namaItem; option.text = namaItem;
            select.appendChild(option);
        });
        
-       // Refresh Select2 agar data baru terbaca
-       $('#item').trigger('change');
+       // Re-init select2 agar data baru terbaca
+       if ($('#item').data('select2')) { $('#item').select2('destroy'); }
+       $('#item').select2({ placeholder: "-- Ketik untuk mencari Item --", allowClear: true, width: '100%' });
+       $('#item').val(null).trigger('change');
 
-    }).getMasterItems(); // <-- Pastikan fungsi getMasterItems() ada di file .gs (server side)
-
-    // 3. Mengaktifkan fitur pencarian (Select2)
-    setTimeout(function() {
-        if($('#item').length > 0) {
-            $('#item').select2({ placeholder: "-- Ketik untuk mencari Item --", allowClear: true, width: '100%' });
-        }
-    }, 100);
+    }).getMasterItems();
 }
 
 function lanjutKonfirmasi(){
@@ -656,7 +963,7 @@ function lanjutKonfirmasi(){
     document.getElementById('c_pj').innerText = elPj.value;
     document.getElementById('c_item').innerText = elItem.value;
     document.getElementById('c_waktu').innerText = elBulan.value + " " + elTahun.value; 
-        document.getElementById('c_jumlah').innerText = "Rp " + numberWithCommas(elJml.value); 
+    document.getElementById('c_jumlah').innerText = "Rp " + numberWithCommas(elJml.value); 
     document.getElementById('c_ket').innerText = elKet.value || "-";
     document.getElementById('inputAnggaran').style.display = 'none'; 
     document.getElementById('konfirmasiAnggaran').style.display = 'block';
@@ -669,7 +976,9 @@ function batalKonfirmasi(){
 
 function simpanFinal(){
     const btn = document.querySelector('#konfirmasiAnggaran .btn-add'); 
-    btn.innerText="Menyimpan..."; btn.disabled=true;
+    const oldText = btn.innerText; 
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...'; 
+    btn.disabled = true;
     
     const dataKirim = {
         pj: document.getElementById('pj').value, 
@@ -680,20 +989,27 @@ function simpanFinal(){
         ket: document.getElementById('ket').value
     };
 
-    google.script.run.withSuccessHandler(()=>{
-        const msg = document.getElementById('msgInput');
-        msg.style.display='block'; msg.innerText="Berhasil disimpan!";
-        $('#item').val(null).trigger('change'); 
-        document.getElementById('jumlah').value=""; 
-        document.getElementById('ket').value=""; 
-        btn.innerText="Simpan"; btn.disabled=false;
-        document.getElementById('konfirmasiAnggaran').style.display='none'; 
-        document.getElementById('inputAnggaran').style.display='block';
-        setTimeout(() => msg.style.display='none', 3000); 
+    google.script.run.withSuccessHandler((res)=>{
+        if (res.status === 'success') {
+            $('#item').val(null).trigger('change'); 
+            document.getElementById('jumlah').value=""; 
+            document.getElementById('ket').value=""; 
+            
+            document.getElementById('konfirmasiAnggaran').style.display='none'; 
+            document.getElementById('inputAnggaran').style.display='block';
+
+            document.querySelector('#modalSuccess .success-title').innerText = "Berhasil Disimpan!";
+            document.querySelector('#modalSuccess .success-desc').innerText = "Data Rencana Penarikan Dana (RPD) baru berhasil ditambahkan.";
+            document.getElementById('modalSuccess').style.display = 'flex';
+        } else {
+            alert("❌ Gagal menyimpan: " + (res.message || "Terjadi kesalahan"));
+        }
+        btn.innerText = oldText; 
+        btn.disabled = false;
     }).simpanAnggaran(dataKirim); 
 }
 
-/* --- MONITORING LOGIC --- */
+/* --- MONITORING (FUNGSI UTAMA) --- */
 function openMonitoring(){ 
     kembali(); 
     document.getElementById('menuGrid').style.display='none'; 
@@ -701,31 +1017,22 @@ function openMonitoring(){
     loadMonitoring(); 
 }
 
-$('#filterTahun').on('change', function() {
-    var table = $('#tabelMon').DataTable();
-    table.draw(); 
-});
+$('#filterTahun').on('change', function() { var table = $('#tabelMon').DataTable(); table.draw(); });
+$('#filterBulan').on('change', function() { var table = $('#tabelMon').DataTable(); table.draw(); });
 
-// SEARCH MATRIX TABLE
 function searchTableMatrix() {
-  var input, filter, table, tr, td, i, txtValue;
+  var input, filter, table, tr, td, i;
   input = document.getElementById("searchMatrix");
   filter = input.value.toUpperCase();
   table = document.getElementById("tabelRekap");
   tr = table.getElementsByTagName("tr");
-
   for (i = 1; i < tr.length; i++) {
     let rowContent = "";
     for(let j=0; j<4; j++) {
         let col = tr[i].getElementsByTagName("td")[j];
         if(col) rowContent += col.textContent || col.innerText;
     }
-    
-    if (rowContent.toUpperCase().indexOf(filter) > -1) {
-      tr[i].style.display = "";
-    } else {
-      tr[i].style.display = "none";
-    }
+    if (rowContent.toUpperCase().indexOf(filter) > -1) tr[i].style.display = ""; else tr[i].style.display = "none";
   }
 }
 
@@ -736,30 +1043,38 @@ function loadMonitoring(){
     google.script.run.withSuccessHandler(res => {
         globalMasterData = res.masterItems; 
         globalTotalPagu = res.totalPagu;
+        globalRowData = res.rows; 
 
+        // Update Kartu Atas
         document.getElementById('valPagu').innerText = "Rp " + numberWithCommas(res.totalPagu);
-        
+        document.getElementById('valRealisasi').innerText = "Rp " + numberWithCommas(res.totalRPD);
+        document.getElementById('valSisa').innerText = "Rp " + numberWithCommas(res.sisaAnggaran);
+
+        // Update Kartu Bawah
+        document.getElementById('valRealisasi2').innerText = "Rp " + numberWithCommas(res.totalRPD);
+        const elsX = document.querySelectorAll('#x');
+        if(elsX.length >= 2) {
+             elsX[0].innerText = "Rp " + numberWithCommas(res.totalRealisasi); 
+             elsX[1].innerText = "Rp " + numberWithCommas(res.sisaRealisasi); 
+        }
+
+        // Logic Filter Tahun
         let years = new Set();
         res.rows.forEach(r => { if(r[4]) years.add(r[4]); });
-
         let filterSelect = document.getElementById('filterTahun');
         let currentVal = filterSelect.value;
         filterSelect.innerHTML = '<option value="">Semua Tahun</option>';
-        
         Array.from(years).sort().reverse().forEach(y => {
             let opt = document.createElement('option');
             opt.value = y; opt.text = y;
             filterSelect.appendChild(opt);
         });
-
         let thisYear = new Date().getFullYear().toString();
-        if(currentVal && years.has(currentVal)) {
-             filterSelect.value = currentVal;
-        } else if (years.has(thisYear)) {
-             filterSelect.value = thisYear;
-        }
+        if(currentVal && years.has(currentVal)) { filterSelect.value = currentVal; } 
+        else if (years.has(thisYear)) { filterSelect.value = thisYear; }
 
         const isMaster = (activeUser === 'PPK1372');
+        const isBendahara = (activeUser === 'BENDAHARA1372');
         const isAdmin = (activeRole === 'admin');
 
         if ($.fn.DataTable.isDataTable('#tabelMon')) { $('#tabelMon').DataTable().destroy(); }
@@ -772,23 +1087,28 @@ function loadMonitoring(){
                         <th>PJ</th> 
                         <th>Item</th>
                         <th>Bulan</th> 
-                        <th>Tahun</th>
-                        <th>Jumlah (Rp)</th> 
-                        <th>Keterangan</th>      
-                        ${(isMaster||isAdmin) ? '<th>Aksi</th>' : ''}
+                        <th>Jumlah RPD</th> 
+                        <th style="background:#e8f5e9;">Realisasi</th> 
+                        <th>Ket</th>      
+                        ${(isMaster||isAdmin||isBendahara) ? '<th>Aksi</th>' : ''}
                     </tr>
                  </thead><tbody>`;
         
         res.rows.forEach((row, idx) => {
-             let realRowIndex = row[8]; 
+             // ARRAY MAPPING (Sesuai update code.gs)
+             // 0:Time, 1:PJ, 2:Item, 3:Bulan, 4:Tahun, 5:JmlRPD, 6:Ket, 7:User, 8:Realisasi, 9:RowIndex
+             
              let rawDate = row[0];
-             let displayDate = rawDate.split("T")[0];
+             let displayDate = typeof rawDate === 'string' ? rawDate.split("T")[0] : new Date(rawDate).toISOString().split('T')[0];
              let pj = row[1];
              let item = row[2];
              let bln = row[3];
              let thn = row[4];
              let rawNominal = parseFloat(row[5]) || 0;
              let ket = row[6] || "-";
+             let rawRealisasi = row[8] ? parseFloat(row[8]) : 0;
+             let displayRealisasi = row[8] ? numberWithCommas(rawRealisasi) : "-";
+             let realRowIndex = row[9]; // ID UNTUK HAPUS/EDIT
 
              h += `<tr>
                       <td style="display:none;">${rawNominal}</td>
@@ -797,25 +1117,51 @@ function loadMonitoring(){
                       <td><small style="font-weight:bold; color:#005bac;">${pj}</small></td>
                       <td><small>${item}</small></td>
                       <td>${bln}</td>
-                      <td>${thn}</td>
                       <td style="text-align:right;">${numberWithCommas(rawNominal)}</td>
+                      <td style="text-align:right; font-weight:bold; color:#107c41;">${displayRealisasi}</td>
                       <td><small>${ket}</small></td>`;
-             if(isMaster || isAdmin){
-                 h += `<td style="text-align:center;">
-                          <button class="btn-del" style="padding:5px 10px;" onclick="hapusMon(${realRowIndex})"><i class="fas fa-trash"></i></button>
-                        </td>`;
+             
+             if(isMaster || isAdmin || isBendahara){
+                 h += `<td style="text-align:center; white-space:nowrap;">`;
+                 
+                 // Tombol Edit RPD (Hanya PPK)
+                 if(activeUser === "PPK1372") {
+                      h += `<button class="btn" style="background:#fbc02d; color:#333; padding:5px 10px; margin-right:4px;" 
+                           onclick="bukaEdit(${idx})" title="Edit RPD">
+                           <i class="fas fa-edit"></i>
+                           </button>`;
+                 }
+                 
+                 // Tombol Input Realisasi (Hanya Bendahara)
+                 if(activeUser === "BENDAHARA1372") {
+                      h += `<button class="btn" style="background:#107c41; color:white; padding:5px 10px; margin-right:4px;" 
+                           onclick="bukaEditRealisasi(${idx})" title="Input Realisasi">
+                           <i class="fas fa-check-double"></i>
+                           </button>`;
+                 }
+                 
+                 // Tombol Hapus (PPK & Bendahara)
+                 if(activeUser === "PPK1372" || activeUser === "BENDAHARA1372"){
+                    h += `<button class="btn-del" style="padding:5px 10px;" onclick="hapusMon(${realRowIndex})"><i class="fas fa-trash"></i></button>`;
+                 }
+
+                 h += `</td>`;
              }
              h += `</tr>`;
         });
         h += "</tbody>";
         tabel.innerHTML = h;
 
+        // Setup DataTable Filter
         $.fn.dataTable.ext.search.push(
             function(settings, data, dataIndex) {
                 var selectedYear = $('#filterTahun').val();
-                var rowYear = data[1]; 
-                if (selectedYear === "") return true;
-                return rowYear == selectedYear;
+                var selectedMonth = $('#filterBulan').val();
+                var rowYear = data[1];  
+                var rowMonth = data[5]; 
+                var matchYear = (selectedYear === "" || rowYear == selectedYear);
+                var matchMonth = (selectedMonth === "" || rowMonth == selectedMonth);
+                return matchYear && matchMonth; 
             }
         );
 
@@ -830,253 +1176,284 @@ function loadMonitoring(){
     }).getMonitoringData();
 }
 
-// FUNGSI AGREGASI MATRIKS (BY KODE)
+/* --- LOGIKA HAPUS DATA --- */
+function hapusMon(rIdx) {
+    tempRowIndex = rIdx; 
+    document.getElementById('modalConfirmDelete').style.display = 'flex';
+}
+
+function tutupConfirmDelete() {
+    document.getElementById('modalConfirmDelete').style.display = 'none';
+}
+
+// Event Listener Tombol Ya Hapus
+document.addEventListener('DOMContentLoaded', function() {
+    const btnHapus = document.getElementById('btnYaHapus');
+    if(btnHapus) {
+        btnHapus.onclick = function() {
+            tutupConfirmDelete();
+            
+            // Panggil server side
+            google.script.run.withSuccessHandler(res => {
+                loadMonitoring(); // Refresh
+                
+                document.querySelector('#modalSuccess .success-title').innerText = "Berhasil Dihapus!";
+                document.querySelector('#modalSuccess .success-desc').innerText = "Data telah berhasil dihapus.";
+                document.querySelector('.success-icon-circle').style.background = "#25D366"; 
+                document.getElementById('modalSuccess').style.display = 'flex';
+            }).deleteAnggaran(tempRowIndex);
+        };
+    }
+});
+
+/* --- EDIT DATA RPD (PPK) --- */
+function bukaEdit(index) {
+    let data = globalRowData[index];
+    if(!data) { alert("Data tidak ditemukan!"); return; }
+
+    let item = data[2];
+    let bulan = data[3];
+    let tahun = data[4];
+    let jumlah = data[5];
+    let ket = data[6];
+    let realRowIndex = data[9]; // index 9
+
+    document.getElementById('edit_rowIndex').value = realRowIndex;
+    document.getElementById('edit_bulan').value = bulan;
+    document.getElementById('edit_tahun').value = tahun;
+    document.getElementById('edit_jumlah').value = numberWithCommas(jumlah);
+    document.getElementById('edit_ket').value = (ket === "-" ? "" : ket);
+
+    let selectItem = document.getElementById('edit_item');
+    selectItem.innerHTML = ""; 
+    if(typeof globalMasterData !== 'undefined') {
+        globalMasterData.forEach(m => {
+            let opt = document.createElement('option');
+            opt.value = m.name; 
+            opt.text = m.name;
+            if(m.name === item) opt.selected = true; 
+            selectItem.appendChild(opt);
+        });
+    }
+    document.getElementById('modalEdit').style.display = 'flex';
+}
+
+function tutupEdit() {
+    document.getElementById('modalEdit').style.display = 'none';
+}
+
+function simpanPerubahan() {
+    const btn = document.querySelector('#modalEdit .btn-add');
+    const oldText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...'; 
+    btn.disabled = true;
+
+    const dataEdit = {
+        rowIndex: document.getElementById('edit_rowIndex').value,
+        item: document.getElementById('edit_item').value,
+        bulan: document.getElementById('edit_bulan').value,
+        tahun: document.getElementById('edit_tahun').value,
+        jumlah: document.getElementById('edit_jumlah').value.replace(/\./g, ""), 
+        ket: document.getElementById('edit_ket').value
+    };
+
+    google.script.run.withSuccessHandler(res => {
+        if(res.status === 'success') {
+            tutupEdit();
+            loadMonitoring();
+            
+            document.querySelector('#modalSuccess .success-title').innerText = "Berhasil!";
+            document.querySelector('#modalSuccess .success-desc').innerText = "Data berhasil diperbarui";
+            document.getElementById('modalSuccess').style.display = 'flex';
+        } else {
+            alert("❌ Gagal update: " + res.message);
+        }
+        btn.innerHTML = oldText; 
+        btn.disabled = false;
+    }).updateEntry(dataEdit);
+}
+
+/* --- FUNGSI BARU: EDIT REALISASI (BENDAHARA) --- */
+function bukaEditRealisasi(index) {
+    let data = globalRowData[index];
+    if(!data) { alert("Data tidak ditemukan!"); return; }
+
+    let item = data[2];
+    let jumlahRPD = data[5];
+    let realisasi = data[8] ? data[8] : "";
+    let realRowIndex = data[9]; // index 9
+
+    document.getElementById('real_rowIndex').value = realRowIndex;
+    document.getElementById('real_info_item').innerText = item;
+    document.getElementById('real_info_rpd').innerText = "Rp " + numberWithCommas(jumlahRPD);
+    document.getElementById('real_jumlah').value = realisasi ? numberWithCommas(realisasi) : "";
+
+    document.getElementById('modalEditRealisasi').style.display = 'flex';
+}
+
+function tutupEditRealisasi() {
+    document.getElementById('modalEditRealisasi').style.display = 'none';
+}
+
+function simpanRealisasi() {
+    const btn = document.querySelector('#modalEditRealisasi .btn-add');
+    const oldText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...'; 
+    btn.disabled = true;
+
+    const dataEdit = {
+        rowIndex: document.getElementById('real_rowIndex').value,
+        realisasi: document.getElementById('real_jumlah').value.replace(/\./g, "") 
+    };
+
+    google.script.run.withSuccessHandler(res => {
+        if(res.status === 'success') {
+            tutupEditRealisasi();
+            
+            document.querySelector('#modalSuccess .success-title').innerText = "Realisasi Disimpan!";
+            document.querySelector('#modalSuccess .success-desc').innerText = "Data realisasi anggaran berhasil diperbarui.";
+            document.getElementById('modalSuccess').style.display = 'flex';
+            
+            loadMonitoring();
+        } else {
+            alert("❌ Gagal update: " + res.message);
+        }
+        btn.innerHTML = oldText; 
+        btn.disabled = false;
+    }).updateRealisasiEntry(dataEdit);
+}
+
 function updateMatrixAndCharts(api) {
     let bulanData = {}; 
     let itemTotalData = {}; 
     let filteredTransactions = []; 
-    let totalFilteredRealisasi = 0; 
-
-    // Objek untuk menampung akumulasi Kode 51 & 52
-    let ringkasanKode = {
-        "51": 0,
-        "52": 0
-    };
+    let totalFilteredRealisasi = 0; // Ini total RPD sebenarnya (berdasarkan penamaan variabel Anda sebelumnya)
+    let totalReal = 0; // Variabel baru untuk total Realisasi keseluruhan
+    
+    // Objek untuk menampung Total RPD (Belanja 51 & 52)
+    let ringkasanKode = { "51": 0, "52": 0 };
+    // Objek BARU untuk menampung Total Realisasi (Belanja 51 & 52)
+    let ringkasanRealisasi = { "51": 0, "52": 0 };
 
     const urutanBulan = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
     urutanBulan.forEach(b => bulanData[b] = 0);
-
+    
     let rows = api.rows({ search: 'applied' }).nodes();
 
     rows.each(function(rowNode) {
+        // Ambil Data RPD (Kolom index 0 - tersembunyi)
         let nom = parseFloat($(rowNode).find('td:eq(0)').text()) || 0; 
+        
+        // Ambil Data Realisasi (Kolom index 7 - terlihat)
+        // Kita perlu membersihkan format "Rp" dan titik ribuan agar bisa dihitung
+        let textReal = $(rowNode).find('td:eq(7)').text();
+        let cleanReal = textReal.replace("Rp ", "").replace(/\./g, "").replace("-", "0").trim();
+        let valReal = parseFloat(cleanReal) || 0;
+
         let itm = $(rowNode).find('td:eq(4)').text(); 
         let bl = $(rowNode).find('td:eq(5)').text(); 
-
+        
         itemTotalData[itm] = (itemTotalData[itm] || 0) + nom;
         if(bulanData[bl] !== undefined) bulanData[bl] += nom;
         
-        totalFilteredRealisasi += nom;
-        filteredTransactions.push({ item: itm, bulan: bl, nominal: nom });
+        totalFilteredRealisasi += nom; // Akumulasi Total RPD
+        totalReal += valReal; // Akumulasi Total Realisasi (untuk kartu atas)
 
-        // LOGIKA BARU: Ambil kode jenbel (51/52) dari nama item
-        let kode = parseCode(itm).jenbel; // Fungsi parseCode sudah ada di bawah
+        filteredTransactions.push({ item: itm, bulan: bl, nominal: nom });
+        
+        // Logika memisahkan Belanja 51 dan 52
+        let kode = parseCode(itm).jenbel; 
         if (ringkasanKode.hasOwnProperty(kode)) {
-            ringkasanKode[kode] += nom;
+            ringkasanKode[kode] += nom;       // Tambah ke RPD
+            ringkasanRealisasi[kode] += valReal; // Tambah ke Realisasi
         }
     });
 
-    // RENDER TABEL RINGKASAN KODE
+    // --- UPDATE TABEL RINGKASAN (BAGIAN YANG DILINGKARI MERAH) ---
     let htmlRingkasan = "";
     ["51", "52"].forEach(k => {
-        htmlRingkasan += `
-            <tr style="font-size: 14px; border-bottom: 1px solid #eee;">
-                <td style="padding: 10px; text-align: center; font-weight: bold; color: var(--blue-dark);">Belanja ${k}</td>
-                <td style="padding: 10px; text-align: right; font-family: monospace;">Rp ${numberWithCommas(ringkasanKode[k])}</td>
-                <td style="padding: 10px; text-align: right; color: #999;">X</td>
-                <td style="padding: 10px; text-align: right; color: #999;">X</td>
+        let rpd = ringkasanKode[k];
+        let realisasi = ringkasanRealisasi[k];
+        let sisa = rpd - realisasi; // Rumus: RPD - Realisasi
+        
+        // Tentukan warna sisa (Merah jika minus, Hijau jika positif/0)
+        let colorSisa = sisa < 0 ? 'var(--danger)' : 'var(--success)';
+
+        htmlRingkasan += `<tr style="font-size: 14px; border-bottom: 1px solid #eee;">
+            <td style="padding: 10px; text-align: center; font-weight: bold; color: var(--blue-dark);">Belanja ${k}</td>
+            <td style="padding: 10px; text-align: right; font-family: monospace;">Rp ${numberWithCommas(rpd)}</td>
+            <td style="padding: 10px; text-align: right; font-family: monospace; font-weight:bold;">Rp ${numberWithCommas(realisasi)}</td>
+            <td style="padding: 10px; text-align: right; font-family: monospace; font-weight:bold; color: ${colorSisa};">Rp ${numberWithCommas(sisa)}</td>
             </tr>`;
     });
     document.getElementById('bodyRingkasanKode').innerHTML = htmlRingkasan;
 
-    // UPDATE SEMUA SCORE CARDS
-    // Score cards bagian atas (Monitoring Anggaran)
+    // --- UPDATE KARTU ATAS & TENGAH ---
+    // Update data kartu Monitoring Anggaran (Total Pagu vs RPD)
     document.getElementById('valRealisasi').innerText = "Rp " + numberWithCommas(totalFilteredRealisasi);
     document.getElementById('valSisa').innerText = "Rp " + numberWithCommas(globalTotalPagu - totalFilteredRealisasi);
-
-    // Score cards bagian bawah (Monitoring Realisasi) - MENGGUNAKAN ID BARU
+    
+    // Update data kartu Monitoring Realisasi (Total RPD vs Realisasi)
     if(document.getElementById('valRealisasi2')) {
         document.getElementById('valRealisasi2').innerText = "Rp " + numberWithCommas(totalFilteredRealisasi);
+        
+        const elsX = document.querySelectorAll('#x');
+        if(elsX.length >= 2) {
+             // Total Realisasi
+             elsX[0].innerText = "Rp " + numberWithCommas(totalReal); 
+             // Selisih (Total RPD - Total Realisasi)
+             elsX[1].innerText = "Rp " + numberWithCommas(totalFilteredRealisasi - totalReal); 
+        }
     }
-
-    renderCharts(itemTotalData, bulanData);
+    
     renderDetailedMatrix(filteredTransactions);
 }
 
-// Helper Parse Kode: GG.2896.BMA.52-JUDUL
+
+
+
 function parseCode(itemStr) {
     let splitDash = itemStr.split('-'); 
     let fullCode = splitDash[0] ? splitDash[0].trim() : ""; 
     let codeParts = fullCode.split('.');
-    return {
-        fullCode: fullCode,
-        prog: codeParts[0] || "-",
-        keg: codeParts[1] || "-",
-        out: codeParts[2] || "-",
-        jenbel: codeParts[3] || "-"
-    };
+    return { fullCode: fullCode, prog: codeParts[0] || "-", keg: codeParts[1] || "-", out: codeParts[2] || "-", jenbel: codeParts[3] || "-" };
 }
 
-// RENDER MATRIKS DETAIL (TANPA AGREGASI, TANPA URAIAN)
 function renderDetailedMatrix(transactions) {
     const tbody = document.getElementById('bodyRekap');
     let html = "";
-    
-    // Iterasi Langsung ke Master Data (Setiap baris master = 1 baris tabel)
     globalMasterData.forEach(master => {
-        let parsed = parseCode(master.name); // Parse Kode
+        let parsed = parseCode(master.name);
         let pagu = master.pagu;
-        
-        // Cari transaksi yg sesuai dengan nama item ini
         let itemTrans = transactions.filter(t => t.item === master.name);
-        
         let totalReal = 0;
         let monthsHtml = "";
         const urutanBulan = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-
         urutanBulan.forEach(bln => {
             let sumMonth = itemTrans.filter(t => t.bulan === bln).reduce((a, b) => a + b.nominal, 0);
             totalReal += sumMonth;
-            
             let displayVal = sumMonth > 0 ? numberWithCommas(sumMonth) : "0";
             let color = sumMonth > 0 ? "#000" : "#ccc"; 
             monthsHtml += `<td style="text-align:right; color:${color};">${displayVal}</td>`;
         });
-
         let sisa = pagu - totalReal;
         let sisaColor = sisa < 0 ? '#e53935' : '#1D6F42';
-
-        html += `<tr>
-            <td class="sticky" style="font-weight:600; color:var(--blue-dark);">${parsed.prog}</td>
-            <td class="sticky">${parsed.keg}</td>
-            <td class="sticky">${parsed.out}</td>
-            <td class="sticky" style="border-right:2px solid #999;">${parsed.jenbel}</td>
-            
-            <td style="text-align:right; background:#f0f8ff;">${numberWithCommas(pagu)}</td>
-            <td style="text-align:right; background:#fff8e1; font-weight:bold;">${numberWithCommas(totalReal)}</td>
-            <td style="text-align:right; font-weight:bold; color:${sisaColor}; border-right:1px solid #ccc;">${numberWithCommas(sisa)}</td>
-            ${monthsHtml}
-        </tr>`;
+        html += `<tr><td class="sticky" style="font-weight:600; color:var(--blue-dark);">${parsed.prog}</td><td class="sticky">${parsed.keg}</td><td class="sticky">${parsed.out}</td><td class="sticky" style="border-right:2px solid #999;">${parsed.jenbel}</td><td style="text-align:right; background:#f0f8ff;">${numberWithCommas(pagu)}</td><td style="text-align:right; background:#fff8e1; font-weight:bold;">${numberWithCommas(totalReal)}</td><td style="text-align:right; font-weight:bold; color:${sisaColor}; border-right:1px solid #ccc;">${numberWithCommas(sisa)}</td>${monthsHtml}</tr>`;
     });
-
     tbody.innerHTML = html;
 }
 
-function renderCharts(itemData, bulanData){
-    let sortedItemKeys = Object.keys(itemData).sort((a,b) => itemData[b] - itemData[a]).slice(0,10);
-    let sortedItemVals = sortedItemKeys.map(k => itemData[k]);
-
-    if(chartInstances['chartItem']) chartInstances['chartItem'].destroy();
-    
-    chartInstances['chartItem'] = new Chart(document.getElementById('chartItem'), {
-        type: 'bar',
-        data: {
-            labels: sortedItemKeys,
-            datasets: [{
-                label: 'Nominal (Rp)', 
-                data: sortedItemVals, 
-                backgroundColor: '#005bac',
-                borderColor: '#003f7d',
-                borderWidth: 1
-            }]
-        },
-        options: { 
-            indexAxis: 'y', 
-            responsive: true, 
-            maintainAspectRatio: false,
-            scales: { x: { beginAtZero: true } }
-        }
-    });
-
-    const urutanBulan = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-    let sortedBulanKeys = urutanBulan; 
-    let sortedBulanVals = sortedBulanKeys.map(k => bulanData[k]);
-    
-    if(chartInstances['chartBulan']) chartInstances['chartBulan'].destroy();
-
-    chartInstances['chartBulan'] = new Chart(document.getElementById('chartBulan'), {
-        type: 'line',
-        data: {
-            labels: sortedBulanKeys,
-            datasets: [{
-                label: 'Nominal (Rp)', 
-                data: sortedBulanVals, 
-                backgroundColor: 'rgba(229, 57, 53, 0.2)',
-                borderColor: '#e53935', 
-                borderWidth: 2, 
-                tension: 0.3, 
-                fill: true
-            }]
-        },
-        options: { responsive: true, maintainAspectRatio: false }
-    });
-}
-
-function hapusMon(rIdx){
-    if(confirm("Yakin ingin menghapus data ini?")) {
-        google.script.run.withSuccessHandler(res => {
-            loadMonitoring(); alert("Data berhasil dihapus!");
-        }).deleteAnggaran(rIdx);
-    }
-}
-
-function downloadXLSX() {
-    var table = document.getElementById("tabelRekap");
-    var rows = table.querySelectorAll("tr");
-    var data = [];
-    var numericColumns = []; // Array untuk menyimpan index kolom angka
-
-    for (var i = 0; i < rows.length; i++) {
-        var row = [];
-        var cols = rows[i].querySelectorAll("td, th");
-        for (var j = 0; j < cols.length; j++) {
-            var text = cols[j].innerText;
-            
-            // Logika: Baris data (>0) dan Kolom Angka (Mulai index 4 ke atas)
-            if (i > 0 && j >= 4) { 
-                // 1. Bersihkan semua karakter KECUALI angka, koma, dan minus
-                //    Ini akan membuang "Rp", spasi, dan titik (ribuan) secara paksa
-                //    Contoh HTML: "1.500.000" -> jadi "1500000"
-                var cleanText = text.replace(/[^\d,-]/g, ""); 
-                
-                // 2. Ganti koma jadi titik (jika ada desimal, misal: 1500,50 -> 1500.50)
-                cleanText = cleanText.replace(",", ".");
-                
-                var number = parseFloat(cleanText);
-                
-                // 3. Push sebagai NUMBER, bukan string
-                row.push(!isNaN(number) ? number : (text.trim() === "-" ? 0 : text));
-            } else {
-                row.push(text);
-            }
-        }
-        data.push(row);
-    }
-
-    var ws = XLSX.utils.aoa_to_sheet(data);
-
-    // --- FITUR TAMBAHAN: AUTO FORMAT NUMBER ---
-    // Agar di Excel angkanya tetap punya titik pemisah ribuan (tapi tetap bisa di-SUM)
-    var range = XLSX.utils.decode_range(ws['!ref']);
-    for (var C = range.s.c; C <= range.e.c; ++C) {
-        for (var R = range.s.r; R <= range.e.r; ++R) {
-            // Terapkan format hanya pada baris data & kolom angka (Index >= 4)
-            if (R > 0 && C >= 4) { 
-                var cell_address = {c: C, r: R};
-                var cell_ref = XLSX.utils.encode_cell(cell_address);
-                if (!ws[cell_ref]) continue;
-                
-                // Format '#,##0' akan mengikuti region Excel user. 
-                // Di PC Indonesia akan jadi 1.500.000, di PC US jadi 1,500,000
-                ws[cell_ref].z = "#,##0"; 
-            }
-        }
-    }
-    // ------------------------------------------
-
-    var wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Laporan Realisasi");
-
-    var selectedYear = document.getElementById('filterTahun').value || "SemuaTahun";
-    var fileName = 'Laporan_Realisasi_' + selectedYear + '.xlsx';
-    XLSX.writeFile(wb, fileName);
+// Fungsi tutup modal sukses
+function tutupSuccess() {
+    document.getElementById('modalSuccess').style.display = 'none';
+    document.querySelector('#modalSuccess .success-title').innerText = "Berhasil!";
+    document.querySelector('#modalSuccess .success-desc').innerText = "Data berhasil diupdate dan diperbarui";
+    document.querySelector('.success-icon-circle').style.background = "#25D366";
+    loadMonitoring(); 
 }
 
 
-
-// ==========================================
-// 6. KELOLA AKUN
-// ==========================================
+// --- KELOLA AKUN ---
 function openPanel(){ kembali(); document.getElementById('menuGrid').style.display='none'; document.getElementById('panel').style.display='block'; loadUser(); }
 
 function loadUser(){
@@ -1098,16 +1475,15 @@ function loadUser(){
             let isMasterAccount = (d[i][0] === "PPK1372");
             let username = d[i][0], password = d[i][1], nama = d[i][2], jabatan = d[i][3];
             
-            let subject = encodeURIComponent(`Info Akun ARUNA BPS Kota Solok - ${nama}`);
+            let subject = encodeURIComponent(`Informasi Akun ARUNA - ${nama}`);
             let bodyPesan = encodeURIComponent(
-              `Halo ${nama},\n\n` + 
-              `Berikut adalah akun login ARUNA BPS Kota Solok Anda:\n\n` +
+              `Halo ${nama},\n` + 
+              `Berikut adalah akun login ARUNA - BPS Kota Solok Anda:\n\n` +
               `Nama: ${nama}\n` +
               `Jabatan: ${jabatan}\n` +
               `Username: ${username}\n` +
-              `Password: ${password}\n\n` +
+              `Password: ${password}\n` +
               
-              `Berikut adalah link akses: s.id/ARUNA1372\n\n`+
               `Harap segera login dan simpan dengan baik akun Anda. Jika terdapat kendala ataupun perlu bantuan harap hubungi admin ARUNA.\n\n` +
               `Sekian, terima kasih.\n` +
               `Tertanda Admin ARUNA,\n` +
@@ -1147,20 +1523,36 @@ function loadUser(){
     }).getAllUsers();
 }
 
+
 function tanyaHapus(username, index){
-    document.getElementById(`aksi_cell_${index}`).innerHTML = `
-        <div style="display:flex; gap:2px;">
-            <button class="btn-save-inline" style="background:#c62828; font-size:10px;" onclick="eksekusiHapus('${username}')">Ya</button>
-            <button class="btn-cancel-inline" style="font-size:10px;" onclick="loadUser()">Batal</button>
-        </div>`;
+    document.getElementById(`aksi_cell_${index}`).innerHTML = `<div style="display:flex; gap:2px;"><button class="btn-save-inline" style="background:#c62828; font-size:10px;" onclick="eksekusiHapus('${username}')">Ya</button><button class="btn-cancel-inline" style="font-size:10px;" onclick="loadUser()">Batal</button></div>`;
 }
 
-function eksekusiHapus(username){
-    google.script.run.withSuccessHandler(loadUser).deleteUser(username);
-}
+function eksekusiHapus(username){ google.script.run.withSuccessHandler(loadUser).deleteUser(username); }
+
 
 function tambah(){ 
-    google.script.run.withSuccessHandler(loadUser).addUser({
+    const btn = document.querySelector('#panel .btn-add');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+    google.script.run.withSuccessHandler(res => {
+        loadUser(); 
+        
+        // Reset form input
+        document.getElementById('u').value = "";
+        document.getElementById('p').value = "";
+        document.getElementById('n').value = "";
+        document.getElementById('j').value = "";
+        
+        // Munculkan Modal M-Banking
+        document.querySelector('#modalSuccess .success-title').innerText = "Akun Dibuat!";
+        document.querySelector('#modalSuccess .success-desc').innerText = "User baru telah berhasil didaftarkan ke dalam database ARUNA.";
+        document.getElementById('modalSuccess').style.display = 'flex';
+        
+        btn.disabled = false;
+        btn.innerText = "Tambah";
+    }).addUser({
         username:document.getElementById('u').value, 
         password:document.getElementById('p').value, 
         nama:document.getElementById('n').value, 
@@ -1168,6 +1560,60 @@ function tambah(){
         role:document.getElementById('r').value
     }); 
 }
+
+/* --- TAMBAHAN/UPDATE FUNGSI JAVASCRIPT --- */
+
+// Fungsi untuk menutup modal sukses
+// Fungsi tutup modal sukses
+function tutupSuccess() {
+    document.getElementById('modalSuccess').style.display = 'none';
+    
+    // Reset teks dan warna ke default
+    document.querySelector('#modalSuccess .success-title').innerText = "Berhasil!";
+    document.querySelector('#modalSuccess .success-desc').innerText = "Data berhasil diupdate dan diperbarui";
+    document.querySelector('.success-icon-circle').style.background = "#25D366";
+    
+    // INI YANG PENTING AGAR REFRESH OTOMATIS
+    loadMonitoring(); 
+}
+
+// Update fungsi Simpan untuk memanggil modal baru
+function simpanPerubahan() {
+    const btn = document.querySelector('#modalEdit .btn-add');
+    const oldText = btn.innerHTML;
+    
+    // Ubah tombol jadi loading
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...'; 
+    btn.disabled = true;
+
+    // Ambil data form
+    const dataEdit = {
+        rowIndex: document.getElementById('edit_rowIndex').value,
+        item: document.getElementById('edit_item').value,
+        bulan: document.getElementById('edit_bulan').value,
+        tahun: document.getElementById('edit_tahun').value,
+        jumlah: document.getElementById('edit_jumlah').value.replace(/\./g, ""), 
+        ket: document.getElementById('edit_ket').value
+    };
+
+    // Kirim ke Backend
+    google.script.run.withSuccessHandler(res => {
+        if(res.status === 'success') {
+            // 1. Tutup Modal Edit Dulu
+            tutupEdit(); 
+            // 2. Tampilkan Modal Sukses (Gaya M-Banking)
+            document.getElementById('modalSuccess').style.display = 'flex';
+            // (Data tabel direfresh saat user klik tombol Tutup di modal sukses)
+            
+        } else {
+            alert("❌ Gagal update: " + res.message); // Kalau gagal tetap alert biasa saja biar jelas errornya
+        }
+        // Kembalikan tombol simpan seperti semula
+        btn.innerHTML = oldText; 
+        btn.disabled = false;    
+    }).updateEntry(dataEdit);
+}
+
 </script>
 </body>
 </html>
