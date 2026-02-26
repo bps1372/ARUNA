@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -226,6 +225,23 @@
       .left{ padding:30px; }
       .header-logo { justify-content: center; }
     }
+
+
+      /* --- TAMBAHAN CSS UNTUK ANIMASI KENDARAAN --- */
+      @keyframes driving {
+        0%   { transform: translateY(0px) rotate(0deg); }
+        25%  { transform: translateY(-1px) rotate(-1deg); }
+        50%  { transform: translateY(0px) rotate(0deg); }
+        75%  { transform: translateY(-2px) rotate(2deg); }
+        100% { transform: translateY(0px) rotate(0deg); }
+      }
+
+      /* Kelas untuk menerapkan animasi ke ikon kendaraan */
+      /* Kita kurangi margin-right sedikit agar jarak antar kendaraan tidak terlalu jauh */
+      .icon-motor-loading {
+        animation: driving 0.3s infinite linear; /* Kecepatan animasi */
+        margin-right: 5px; /* Jarak antar ikon */
+      }
   </style>
 </head>
 
@@ -250,7 +266,7 @@
     </div>
 
     <div class="right">
-      <h2>Selamat Datang</h2>
+      <h2>Selamat Datang <br> Sobat ARUNA</h2>
       <p>Silakan masuk ke akun ARUNA Anda</p>
 
       <input id="username" placeholder="Username">
@@ -294,7 +310,6 @@
         <li><b>Login:</b> Gunakan username dan password yang telah diberikan oleh admin.</li>
         <li><b>Input Anggaran:</b> Pilih menu "Input Anggaran", isi item kegiatan, jumlah diajukan, dan keterangan tambahan.</li>
         <li><b>Monitoring:</b> tabel monitoring serta rincian infografis anggaran diajukan dan ter-realisasi.</li>
-        <li><b>Download:</b> Anda dapat mengekspor data ke format Excel untuk keperluan laporan offline.</li>
       </ul>
 
      
@@ -320,20 +335,53 @@
     function login(){
       const u = document.getElementById("username").value;
       const p = document.getElementById("password").value;
+      
+      // 1. Ambil elemen tombol login
+      const btn = document.querySelector(".btn-login"); 
+
       if(!u || !p) { showError("Username dan password wajib diisi."); return; }
       
+      // 2. Ubah tampilan tombol saat proses dimulai
+      const originalText = btn.innerHTML; // Simpan teks asli
+      btn.innerHTML = '</i><i class="fas fa-car-side icon-motor-loading"></i><i class="fas fa-motorcycle icon-motor-loading" style="margin-right: 10px;"></i> .....Login';
+      btn.disabled = true; // Matikan tombol agar tidak diklik 2x
+      btn.style.opacity = "0.7";
+      btn.style.cursor = "not-allowed";
+
       // Integrasi dengan Apps Script
       if(typeof google !== 'undefined') {
-        google.script.run.withSuccessHandler(res=>{
-          if(res.status === "success"){
-            window.top.location.href = res.url;
-          }else{
-            showError("Username atau password salah");
-          }
-        }).loginUser(u,p);
+        google.script.run
+          .withSuccessHandler(res => {
+            if(res.status === "success"){
+              window.top.location.href = res.url;
+              // Jika sukses, biarkan loading karena halaman akan pindah
+            } else {
+              showError("Username atau password salah");
+              
+              // 3. Kembalikan tombol jika GAGAL (password salah)
+              resetButton(btn, originalText);
+            }
+          })
+          .withFailureHandler(error => {
+            showError("Terjadi kesalahan jaringan.");
+            
+            // 4. Kembalikan tombol jika ERROR server
+            resetButton(btn, originalText);
+          })
+          .loginUser(u,p);
       } else {
         console.log("Running in local environment");
+        // Simulasi jika di local
+        setTimeout(() => { resetButton(btn, originalText); }, 2000);
       }
+    }
+
+    // Fungsi helper untuk mengembalikan tombol ke semula
+    function resetButton(btn, text) {
+      btn.innerHTML = text;
+      btn.disabled = false;
+      btn.style.opacity = "1";
+      btn.style.cursor = "pointer";
     }
 
     function showError(msg) {
@@ -341,6 +389,7 @@
       err.style.display = "block";
       err.innerText = msg;
     }
+    
   </script>
 </body>
 </html>
