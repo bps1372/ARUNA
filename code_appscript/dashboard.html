@@ -1,687 +1,1021 @@
-<!-- Keterangan Data -->
-<!-- valRealisasi dan valrealisasi2: data total RPD (inputanuser)-->
-<!-- valpagu: data total pagu-->
-<!-- valSisa: data selisih (TOTAL RPD - TOTAL PAGU)--> 
-
-
-
-
 <? var user = getUser(); ?>
 <!DOCTYPE html>
 <html>
 <head>
-<base target="_top">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard | ARUNA BPS</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<style>
-  body { zoom: 68%; }
-  :root{ 
-    /* UPDATE WARNA DI SINI */
-    --blue: rgba(35, 110, 155, 0.8); 
-    --blue-dark: #224b74; 
-    --light: #f4f7fb; 
-    --danger: #e53935; 
-    --success: #25D366; 
-    --warning: #fbc02d; 
-    --text-dark: #333; 
-    --sidebar-width: 260px; 
-  }
-  * { box-sizing:border-box; font-family: 'Poppins', sans-serif; }
-  body { margin:0; background:var(--light); color: var(--text-dark); }
+    <base target="_top">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | ARUNA BPS</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    
+    <style>
+        body { zoom: 68%; }
+        :root { 
+            /* UPDATE WARNA DI SINI */
+            --blue: rgba(35, 110, 155, 0.8); 
+            --blue-dark: #224b74; 
+            --light: #f4f7fb; 
+            --danger: #e53935; 
+            --success: #25D366; 
+            --warning: #fbc02d; 
+            --text-dark: #333; 
+            --sidebar-width: 260px; 
+        }
+        * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { margin: 0; background: var(--light); color: var(--text-dark); }
 
-  /* Layout & Sidebar */
-  .app { 
-  display:grid; 
-  grid-template-columns: var(--sidebar-width) 1fr; 
-  min-height:100vh; 
-  transition: 0.3s; 
-  align-items: stretch; /* Tambahkan ini agar semua kolom sama tinggi */
-}
-  .sidebar { 
-  background: linear-gradient(180deg, var(--blue) 0%, var(--blue-dark) 100%); 
-  color:white; 
-  padding:25px; 
-  box-shadow: 4px 0 10px rgba(0,0,0,0.1); 
-  position: relative; 
-  z-index: 10; 
-  border-bottom-right-radius: 60px;
-  /* Tambahkan kode di bawah ini */
-  display: flex;
-  flex-direction: column;
-  min-height: 150vh; /* Memastikan tinggi minimal setinggi layar */
-}
-  .profile { background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; margin-bottom:30px; font-size:13px; color:#eaf3ff; border: 1px solid rgba(255,255,255,0.2); }
-  .menu a { display:flex; align-items: center; gap: 10px; padding:12px 15px; border-radius:10px; margin-bottom:8px; color:#eaf3ff; text-decoration:none; cursor:pointer; transition: 0.3s; }
-  .menu a:hover, .menu a.active { background: rgba(255,255,255,0.2); transform: translateX(5px); }
-  .menu a.logout { background: rgba(229, 57, 53, 0.8); margin-top:10px; }
+        /* Layout & Sidebar */
+        .app { 
+            display: grid; 
+            grid-template-columns: var(--sidebar-width) 1fr; 
+            min-height: 100vh; 
+            transition: 0.3s; 
+            align-items: stretch; /* Tambahkan ini agar semua kolom sama tinggi */
+        }
+        .sidebar { 
+            background: linear-gradient(180deg, var(--blue) 0%, var(--blue-dark) 100%); 
+            color: white; 
+            padding: 25px; 
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1); 
+            position: relative; 
+            z-index: 10; 
+            border-bottom-right-radius: 60px;
+            /* Tambahkan kode di bawah ini */
+            display: flex;
+            flex-direction: column;
+            min-height: 150vh; /* Memastikan tinggi minimal setinggi layar */
+        }
+        .profile { background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; margin-bottom: 30px; font-size: 13px; color: #eaf3ff; border: 1px solid rgba(255,255,255,0.2); }
+        .menu a { display: flex; align-items: center; gap: 10px; padding: 12px 15px; border-radius: 10px; margin-bottom: 8px; color: #eaf3ff; text-decoration: none; cursor: pointer; transition: 0.3s; }
+        .menu a:hover, .menu a.active { background: rgba(255,255,255,0.2); transform: translateX(5px); }
+        
+        /* Baris 60-an: Update style tombol logout */
+        /* --- ANIMASI LOGOUT CODING.PIXEL ARUNA THEME --- */
+        .menu a.logout { 
+            position: relative;
+            background: white; /* Mengikuti gambar mode light */
+            color: var(--blue-dark); 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            padding: 12px 18px; 
+            border-radius: 8px; 
+            margin-top: 25px; 
+            text-decoration: none; 
+            cursor: pointer; 
+            overflow: hidden; /* Sembunyikan orang saat jatuh ke bawah */
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
 
-  /* Content */
-  .content { padding:30px; overflow-y: auto; min-height: 100vh; }
+        .menu a.logout:hover { 
+            background: var(--light); 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
 
-  /* Background Image */
-  body::before {
-    content: "";
-    position: fixed; 
-    inset: 0;
-    background: 
-        linear-gradient(rgba(255,255,255,0.88), rgba(255,255,255,0.88));
-    background-size: cover;  
-    background-position: center;
-    background-repeat: no-repeat;
-    z-index: -1;
-  }
+        .menu a.logout .button-text {
+            font-weight: 600;
+            font-size: 14px;
+        }
 
-  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:25px; }
-  .card { background:white; border-radius:16px; padding:25px; box-shadow:0 10px 25px rgba(0,0,0,.05); cursor:pointer; transition: 0.3s; border-bottom: 4px solid transparent; }
-  .card:hover { transform: translateY(-5px); border-bottom-color: var(--blue); }
-  .card i { font-size: 2rem; color: var(--blue); margin-bottom: 15px; }
+        /* Kontainer Pintu & Orang */
+        .menu a.logout .icon-doorway {
+            position: relative;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-  .panel { 
-  display:none; 
-  background:white; 
-  padding:30px; 
-  padding-bottom: 60px; /* Tambahkan ini agar ada ruang di bawah grafik */
-  border-radius:16px; 
-  box-shadow:0 10px 30px rgba(0,0,0,.08); 
-  animation: fadeIn 0.4s ease; 
-}
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Ikon Pintu */
+        .menu a.logout .door {
+            position: absolute;
+            font-size: 20px;
+            color: var(--blue-dark);
+        }
 
-  input, select, textarea { width:100%; padding:10px; margin-bottom:15px; border: 1px solid #ddd; border-radius:8px; font-size: 14px; background: #fafafa; }
-  .btn-group { display: flex; gap: 10px; margin-top: 10px; }
-  .btn { padding:10px 20px; border:none; border-radius:8px; cursor:pointer; color:white; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; }
-  .btn-add { background:var(--blue); }
-  .btn-del { background:var(--danger); }
-  .btn-excel { background-color: #1D6F42; }
+        /* Ikon Orang */
+        .menu a.logout .figure {
+            position: absolute;
+            font-size: 13px;
+            color: var(--blue); /* Warna biru cerah ARUNA */
+            right: 6px;
+            bottom: 2px;
+            /* bezier ini meniru kecepatan lari dan jatuh di video */
+            transition: all 0.6s cubic-bezier(0.7, 0.1, 1, 1); 
+        }
 
-  /* Style Tombol Inline di Tabel Akun */
-  .btn-save-inline { background: var(--blue); color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
-  .btn-cancel-inline { background: #ccc; color: #333; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        /* Animasi lari dan jatuh memutar saat kursor diarahkan (hover) */
+        .menu a.logout:hover .figure {
+            transform: translateX(25px) translateY(30px) rotate(360deg);
+            opacity: 0;
+        }
 
-  /* MATRIKS TABLE STYLE */
-  .table-responsive { overflow-x:auto; border-radius: 8px; border: 1px solid #eee; background: white; }
-  
-  #tabelRekap { width:100%; border-collapse:separate; border-spacing: 0; white-space: nowrap; }
-  #tabelRekap th, #tabelRekap td { border-bottom:1px solid #eee; border-right: 1px solid #eee; padding:10px 8px; font-size:12px; vertical-align: middle; }
-  
-  #tabelRekap thead th { background:var(--blue); color: white; text-align: center; font-weight: 600; text-transform: uppercase; font-size: 11px; }
-  
-  /* Sticky Columns Logic */
-  #tabelRekap th.sticky, #tabelRekap td.sticky { 
-      position: sticky; 
-      background-color: #fff; 
-      z-index: 2;
-  }
-  
-  /* Sticky Positions (4 Kolom Kode) */
-  #tabelRekap th:nth-child(1), #tabelRekap td:nth-child(1) { left: 0; min-width: 50px; text-align: center; border-right: 1px solid #ddd; }
-  #tabelRekap th:nth-child(2), #tabelRekap td:nth-child(2) { left: 50px; min-width: 60px; text-align: center; border-right: 1px solid #ddd; }
-  #tabelRekap th:nth-child(3), #tabelRekap td:nth-child(3) { left: 110px; min-width: 50px; text-align: center; border-right: 1px solid #ddd; }
-  #tabelRekap th:nth-child(4), #tabelRekap td:nth-child(4) { 
-      left: 160px; 
-      min-width: 50px; 
-      text-align: center; 
-      border-right: 2px solid #999; 
-  }
+        .content { 
+            padding: 30px; 
+            overflow: visible; /* Penting: jangan gunakan hidden/scroll di sini */
+            min-height: 100vh; 
+        }
 
-  #tabelRekap thead th.sticky { background-color: var(--blue); z-index: 3; }
-  
-  #tabelRekap tr:nth-child(even) td { background-color: #f8f9fa; }
-  #tabelRekap tr:nth-child(even) td.sticky { background-color: #f8f9fa; }
-  #tabelRekap tr:hover td { background-color: #e3f2fd; }
-  #tabelRekap tr:hover td.sticky { background-color: #e3f2fd; }
+        /* Background Image */
+        body::before {
+            content: "";
+            position: fixed; 
+            inset: 0;
+            background: linear-gradient(rgba(255,255,255,0.88), rgba(255,255,255,0.88));
+            background-size: cover;  
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: -1;
+        }
 
-  #tabelRekap td:nth-child(n+5) { text-align: right; font-family: 'Consolas', monospace; font-size: 11px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap: 25px; }
+        .card { background: white; border-radius: 16px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,.05); cursor: pointer; transition: 0.3s; border-bottom: 4px solid transparent; }
+        .card:hover { transform: translateY(-5px); border-bottom-color: var(--blue); }
+        .card i { font-size: 2rem; color: var(--blue); margin-bottom: 15px; }
 
-  #tabelRekap td:nth-child(5) { background-color: #f0f8ff; font-weight: bold; } 
-  #tabelRekap td:nth-child(6) { background-color: #fff8e1; font-weight: bold; } 
-  #tabelRekap td:nth-child(7) { font-weight: bold; border-right: 2px solid #ccc; } 
+        .panel { 
+            display: none; 
+            background: white; 
+            padding: 30px; 
+            padding-bottom: 60px; /* Tambahkan ini agar ada ruang di bawah grafik */
+            border-radius: 16px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,.08); 
+            animation: fadeIn 0.4s ease; 
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-  .matrix-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-  .search-box-matrix { 
-      padding: 8px 12px; 
-      border: 1px solid #ccc; 
-      border-radius: 6px; 
-      width: 300px; 
-      font-size: 13px;
-  }
+        input, select, textarea { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; background: #fafafa; }
+        .btn-group { display: flex; gap: 10px; margin-top: 10px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; color: white; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; }
+        .btn-add { background: var(--blue); }
+        .btn-del { background: var(--danger); }
+        .btn-excel { background-color: #1D6F42; }
 
-  #tabelMon { width:100%; border-collapse:collapse; white-space: nowrap; }
-  #tabelMon th { background:#eef3f9; color: var(--blue-dark); font-weight: 600; padding:10px; text-align: left;}
-  #tabelMon td { border-bottom:1px solid #eee; padding:10px; font-size:13px; }
+        /* Style Tombol Inline di Tabel Akun */
+        .btn-save-inline { background: var(--blue); color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .btn-cancel-inline { background: #ccc; color: #333; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
 
-  .charts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 30px; }
-  .chart-card { 
-  background: #fff; 
-  border: 1px solid #eee; 
-  border-radius: 12px; 
-  padding: 15px; 
-  height: 350px; /* Gunakan min-height agar bisa menyesuaikan */ 
-}
-  
-  .select2-container .select2-selection--single { height: 42px !important; padding: 6px; border: 1px solid #ddd; border-radius: 8px; background-color: #fafafa; }
-  .select2-container--default .select2-selection--single .select2-selection__arrow { height: 40px; }
-   
-  .filter-section { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #eee; width: fit-content;}
-  .filter-section label { font-weight: bold; margin: 0; color: var(--blue-dark); }
-  .filter-section select { width: auto; min-width: 120px; margin: 0; }
-  
-  .score-card { text-align: center; padding: 20px; border-radius: 12px; border: 1px solid #eee; background: white; }
-  .score-title { font-size: 13px; color: #666; margin-bottom: 5px; }
-  .score-value { font-size: 22px; font-weight: bold; color: var(--text-dark); }
+        /* MATRIKS TABLE STYLE */
+        .table-responsive { overflow-x: auto; border-radius: 8px; border: 1px solid #eee; background: white; }
+        
+        #tabelRekap { width: 100%; border-collapse: separate; border-spacing: 0; white-space: nowrap; }
+        #tabelRekap th, #tabelRekap td { border-bottom: 1px solid #eee; border-right: 1px solid #eee; padding: 10px 8px; font-size: 12px; vertical-align: middle; }
+        
+        #tabelRekap thead th { background: var(--blue); color: white; text-align: center; font-weight: 600; text-transform: uppercase; font-size: 11px; }
+        
+        /* Sticky Columns Logic */
+        #tabelRekap th.sticky, #tabelRekap td.sticky { 
+            position: sticky; 
+            background-color: #fff; 
+            z-index: 2;
+        }
+        
+        /* Sticky Positions (4 Kolom Kode) */
+        #tabelRekap th:nth-child(1), #tabelRekap td:nth-child(1) { left: 0; min-width: 50px; text-align: center; border-right: 1px solid #ddd; }
+        #tabelRekap th:nth-child(2), #tabelRekap td:nth-child(2) { left: 50px; min-width: 60px; text-align: center; border-right: 1px solid #ddd; }
+        #tabelRekap th:nth-child(3), #tabelRekap td:nth-child(3) { left: 110px; min-width: 50px; text-align: center; border-right: 1px solid #ddd; }
+        #tabelRekap th:nth-child(4), #tabelRekap td:nth-child(4) { 
+            left: 160px; 
+            min-width: 50px; 
+            text-align: center; 
+            border-right: 2px solid #999; 
+        }
 
-  #tabel td, #tabel th { padding: 10px; }
+        #tabelRekap thead th.sticky { background-color: var(--blue); z-index: 3; }
+        
+        #tabelRekap tr:nth-child(even) td { background-color: #f8f9fa; }
+        #tabelRekap tr:nth-child(even) td.sticky { background-color: #f8f9fa; }
+        #tabelRekap tr:hover td { background-color: #e3f2fd; }
+        #tabelRekap tr:hover td.sticky { background-color: #e3f2fd; }
 
-  /* HEADER DASHBOARD */
-  .header-banner {
-    background: linear-gradient(90deg, var(--blue) 0%, var(--blue-dark) 100%);
-    padding: 25px 30px 50px 30px; 
-    margin: -30px -30px 30px -30px; 
-    display: flex;
-    justify-content: flex-end; 
-    align-items: center;
-  }
+        #tabelRekap td:nth-child(n+5) { text-align: right; font-family: 'Consolas', monospace; font-size: 11px; }
 
-  .user-badge-card {
-    background: white;
-    padding: 10px 20px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    min-width: 200px;
-    justify-content: space-between;
-  }
+        #tabelRekap td:nth-child(5) { background-color: #f0f8ff; font-weight: bold; } 
+        #tabelRekap td:nth-child(6) { background-color: #fff8e1; font-weight: bold; } 
+        #tabelRekap td:nth-child(7) { font-weight: bold; border-right: 2px solid #ccc; } 
 
-  .grid { 
-    display:grid; 
-    grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); 
-    gap:25px; 
-    margin-top: -60px; 
-    position: relative;
-    z-index: 2;
-  }
+        .matrix-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .search-box-matrix { 
+            padding: 8px 12px; 
+            border: 1px solid #ccc; 
+            border-radius: 6px; 
+            width: 300px; 
+            font-size: 13px;
+        }
 
-/* Style Modal Edit */
-.modal-overlay {
-  display: none; position: fixed; z-index: 9999; left: 0; top: 0;
-  width: 100%; height: 100%; overflow: auto; 
-  background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center;
-}
-.modal-box {
-  background-color: #fefefe; margin: 10% auto; padding: 20px; border-radius: 10px;
-  border: 1px solid #888; width: 90%; max-width: 500px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2); animation: fadeIn 0.3s;
-}
-.modal-header { font-size: 18px; font-weight: bold; margin-bottom: 15px; color: var(--blue-dark); border-bottom: 1px solid #eee; padding-bottom: 10px;}
-.close-btn { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 20px;}
-.close-btn:hover { color: black; }
-/* --- STYLE NOTIFIKASI SUKSES (M-BANKING STYLE) --- */
-.success-box {
-  background: white;
-  width: 90%;
-  max-width: 320px;
-  padding: 30px 20px;
-  border-radius: 20px; /* Sudut membulat khas aplikasi mobile */
-  text-align: center;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-  animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Efek membal saat muncul */
-}
+        #tabelMon { width: 100%; border-collapse: collapse; white-space: nowrap; }
+        #tabelMon th { background: #eef3f9; color: var(--blue-dark); font-weight: 600; padding: 10px; text-align: left; }
+        #tabelMon td { border-bottom: 1px solid #eee; padding: 10px; font-size: 13px; }
 
-.success-icon-circle {
-  width: 70px;
-  height: 70px;
-  background: #25D366; /* Warna Hijau WA/Sukses */
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 20px auto;
-  box-shadow: 0 5px 15px rgba(37, 211, 102, 0.4);
-}
+        .charts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 30px; }
+        .chart-card { 
+            background: #fff; 
+            border: 1px solid #eee; 
+            border-radius: 12px; 
+            padding: 15px; 
+            height: 350px; /* Gunakan min-height agar bisa menyesuaikan */ 
+        }
+        
+        .select2-container .select2-selection--single { height: 42px !important; padding: 6px; border: 1px solid #ddd; border-radius: 8px; background-color: #fafafa; }
+        .select2-container--default .select2-selection--single .select2-selection__arrow { height: 40px; }
+        
+        .filter-section { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #eee; width: fit-content; }
+        .filter-section label { font-weight: bold; margin: 0; color: var(--blue-dark); }
+        .filter-section select { width: auto; min-width: 120px; margin: 0; }
+        
+        .score-card { text-align: center; padding: 20px; border-radius: 12px; border: 1px solid #eee; background: white; }
+        .score-title { font-size: 13px; color: #666; margin-bottom: 5px; }
+        .score-value { font-size: 22px; font-weight: bold; color: var(--text-dark); }
 
-.success-icon-circle i {
-  color: white;
-  font-size: 30px;
-}
+        #tabel td, #tabel th { padding: 10px; }
 
-.success-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: #333;
-  margin-bottom: 5px;
-}
+        /* HEADER DASHBOARD - FIXED / STICKY VERSION */
+        /* HEADER DASHBOARD */
+        .header-banner {
+            background: linear-gradient(90deg, var(--blue) 0%, var(--blue-dark) 100%);
+            padding: 25px 30px 50px 30px; 
+            margin: -30px -30px 30px -30px; 
+            display: flex;
+            justify-content: flex-end; 
+            align-items: center;
+            
+            /* --- KODE BARU --- */
+            position: sticky;
+            top: 0; /* <--- Ubah ke 0 agar menempel di bawah baris peringatan biru */
+            z-index: 999; 
+        }
 
-.success-desc {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 25px;
-  line-height: 1.5;
-}
+        .user-badge-card {
+            background: white;
+            padding: 10px 20px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            min-width: 200px;
+            justify-content: space-between;
+        }
 
-.btn-success-close {
-  background: #f4f7fb;
-  color: #333;
-  border: none;
-  padding: 12px 0;
-  width: 100%;
-  border-radius: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.2s;
-}
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); 
+            gap: 25px; 
+            margin-top: -35px; 
+            position: relative;
+            z-index: 2;
+        }
 
-.btn-success-close:hover {
-  background: #e0e0e0;
-}
+        /* Style Modal Edit */
+        .modal-overlay {
+            display: none; position: fixed; z-index: 9999; left: 0; top: 0;
+            width: 100%; height: 100%; overflow: auto; 
+            background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center;
+        }
+        .modal-box {
+            background-color: #fefefe; margin: 10% auto; padding: 20px; border-radius: 10px;
+            border: 1px solid #888; width: 90%; max-width: 500px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2); animation: fadeIn 0.3s;
+        }
+        .modal-header { font-size: 18px; font-weight: bold; margin-bottom: 15px; color: var(--blue-dark); border-bottom: 1px solid #eee; padding-bottom: 10px;}
+        .close-btn { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 20px;}
+        .close-btn:hover { color: black; }
 
-@keyframes popUp {
-  0% { transform: scale(0.5); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
-}
+        /* --- STYLE NOTIFIKASI SUKSES (M-BANKING STYLE) --- */
+        .success-box {
+            background: white;
+            width: 90%;
+            max-width: 320px;
+            padding: 30px 20px;
+            border-radius: 20px; /* Sudut membulat khas aplikasi mobile */
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Efek membal saat muncul */
+        }
 
+        .success-icon-circle {
+            width: 70px;
+            height: 70px;
+            background: #25D366; /* Warna Hijau WA/Sukses */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px auto;
+            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.4);
+        }
 
+        .success-icon-circle i {
+            color: white;
+            font-size: 30px;
+        }
 
-</style>
+        .success-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .success-desc {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .btn-success-close {
+            background: #f4f7fb;
+            color: #333;
+            border: none;
+            padding: 12px 0;
+            width: 100%;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-success-close:hover {
+            background: #e0e0e0;
+        }
+
+        @keyframes popUp {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* --- STYLE UNTUK COLLAPSE (HIDE) SIDEBAR --- */
+        .app { transition: grid-template-columns 0.3s ease; } /* Pastikan transisi mulus */
+        .app.collapsed { grid-template-columns: 80px 1fr; }
+        .app.collapsed .profile, 
+        .app.collapsed .menu, 
+        .app.collapsed .logo-text { display: none !important; }
+        .app.collapsed .sidebar { padding: 25px 15px; align-items: center; border-bottom-right-radius: 30px;}
+
+        /* --- STYLE TARGET RPD MODERN (BERWARNA) --- */
+        .target-container { 
+            display: flex; gap: 20px; overflow-x: auto; padding-bottom: 20px; 
+        }
+        .target-col { 
+            display: flex; flex-direction: column; gap: 20px; min-width: 270px; 
+            background: white; padding: 25px 20px; border-radius: 16px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #f0f0f0;
+        }
+        .target-title { 
+            text-align: center; font-weight: 700; font-size: 16px; margin-bottom: 5px; 
+            color: var(--blue-dark); text-transform: uppercase; letter-spacing: 1.5px;
+            border-bottom: 3px solid var(--blue); padding-bottom: 12px;
+        }
+        
+        .target-table { 
+            width: 100%; border-collapse: separate; border-spacing: 0; 
+            text-align: center; font-family: 'Poppins', sans-serif; font-size: 13px; 
+            border-radius: 10px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+            border: 1px solid #eaedf1;
+        }
+        
+        .target-table th, .target-table td { 
+            padding: 10px 8px; border-bottom: 1px solid #eaedf1; border-right: 1px solid #eaedf1; 
+        }
+        .target-table th:last-child, .target-table td:last-child { border-right: none; }
+        .target-table tr:last-child td { border-bottom: none; }
+        
+        /* Warna Header Dinamis dengan Gradasi */
+        .target-table th { font-weight: 600; border: none !important; }
+        .target-table.tbl-pagu th { background: linear-gradient(135deg, var(--blue) 0%, var(--blue-dark) 100%); color: white; }
+        .target-table.tbl-target th { background: linear-gradient(135deg, #fbc02d 0%, #f39c12 100%); color: white; }
+        .target-table.tbl-rpd th { background: linear-gradient(135deg, #25D366 0%, #1D6F42 100%); color: white; }
+        .target-table.tbl-selisih th { background: linear-gradient(135deg, #e53935 0%, #c62828 100%); color: white; }
+        
+        /* Tipografi Baris Dalam */
+        .target-table tr:nth-child(2) td { 
+            background: #f8f9fa; font-size: 12px; font-weight: 700; color: #555; 
+        }
+        .target-table tr:nth-child(3) td { 
+            font-family: 'Consolas', monospace; font-size: 14px; font-weight: bold; color: #333; 
+        }
+                  /* Styling untuk Tabel Rincian RPD */
+          .tabel-rpd-container {
+            margin-top: 40px;
+            margin-bottom: 20px;
+            width: 100%;
+            overflow-x: auto;
+          }
+
+          .tabel-rpd {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            font-size: 12px;
+            font-family: Arial, sans-serif;
+            text-align: right; /* Default text ke kanan untuk angka */
+          }
+
+          .tabel-rpd th, .tabel-rpd td {
+            border: 1px solid #000;
+            padding: 6px 8px;
+          }
+
+          .tabel-rpd th {
+            background-color: #fff;
+            text-align: center;
+            font-weight: bold;
+            vertical-align: middle;
+          }
+
+          .tabel-rpd td:first-child, .tabel-rpd th:first-child {
+            text-align: center; /* Kolom KODE di tengah */
+            font-weight: bold;
+          }
+
+          /* Warna background untuk kolom 51 dan 52 (opsional, disesuaikan dengan gambar) */
+          .col-51 {
+            background-color: #e8f0fe; /* Biru muda */
+          }
+
+          .col-52 {
+            background-color: #fce8e6; /* Merah muda */
+          }
+
+          .tabel-rpd tfoot td {
+            font-weight: bold;
+            background-color: #f1f3f4;
+          }
+
+          .judul-tabel {
+            text-align: left;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #236e9b;
+          }
+
+    </style>
 </head>
 <body>
-<div class="app">
-    <div class="sidebar">
-        <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px;">
-            <img src="https://www.bps.go.id/_next/image?url=%2Fassets%2Flogo-bps.png&w=3840&q=75" width="50" style="filter: brightness(0) invert(1);">
-            <div style="text-align: left;">
-                <h2 style="margin: 0; font-size: 24px; line-height: 1.1;">ARUNA</h2>
-                <small style="font-size: 11px; opacity: 0.8; display: block; font-style: italic;">BPS Kota Solok</small>
-            </div>
-        </div>
-        <div class="profile" style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px;">     
-            <div style="font-size: 50px; color: rgba(255,255,255,0.8);"><i class="fas fa-user-circle"></i></div>
-            <div style="line-height: 1.2;">
-                <b style="font-size: 16px; display: block; margin-bottom: 5px;"><?= user.nama ?></b>
-                <span style="font-size: 12px; opacity: 0.9;"><?= user.jabatan ?></span><br>
-                <small style="font-size: 10px; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px;"><?= user.role ?></small>
-            </div>     
-        </div>
-        <div class="menu">
-            <a id="navDash" class="active" onclick="kembali()"><i class="fas fa-home"></i> Dashboard</a>
-            <a id="navInput" onclick="openInputAnggaran()"><i class="fas fa-plus-circle"></i> Rekam Rencana Penarikan Dana</a>
-            <a id="navMon" onclick="openMonitoring()"><i class="fas fa-chart-line"></i> Monitoring Anggaran</a>
-            <? if (user.username === "PPK1372") { ?> 
-                <a id="navUser" onclick="openPanel()"><i class="fas fa-users-cog"></i> Kelola Akun</a> 
-                <a href="https://drive.google.com/drive/folders/1ZqsqK1X-WnS11uH-Xr0CKoCsgkXIj6al?usp=sharing" target="_blank">
-                    <i class="fab fa-google-drive"></i> Google Drive
-                </a>
-            <? } ?>
-            <a class="logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
-        </div>
-    </div>
-
-    <div class="content">
-        
-        <div class="header-banner" id="dashHeader">
-            <div class="user-badge-card">
-                <div style="text-align: right;">
-                    <h3 style="margin: 0; color: var(--blue); font-weight: 700;">HAI, <?= user.nama ?></h3>
+    <div class="app">
+        <div class="sidebar">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px; cursor: pointer;" onclick="toggleSidebar()" title="Klik untuk Hide/Show Menu">
+                <img src="https://www.bps.go.id/_next/image?url=%2Fassets%2Flogo-bps.png&w=3840&q=75" width="50" style="filter: brightness(0) invert(1);">
+                <div class="logo-text" style="text-align: left;">
+                    <h2 style="margin: 0; font-size: 24px; line-height: 1.1;">ARUNA</h2>
+                    <small style="font-size: 11px; opacity: 0.8; display: block; font-style: italic;">BPS Kota Solok</small>
                 </div>
-            </div>
         </div>
-
-        <div class="grid" id="menuGrid">
-            <div class="card" onclick="openInputAnggaran()">
-                <i class="fas fa-file-invoice-dollar"></i>
-                <h3>Rekam Rencana Penarikan Dana</h3>
-                <p>Ajukan penarikan dana baru</p>
+            <div class="profile" style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px;">     
+                <div style="font-size: 50px; color: rgba(255,255,255,0.8);"><i class="fas fa-user-circle"></i></div>
+                <div style="line-height: 1.2;">
+                    <b style="font-size: 16px; display: block; margin-bottom: 5px;"><?= user.nama ?></b>
+                    <span style="font-size: 12px; opacity: 0.9;"><?= user.jabatan ?></span><br>
+                    <small style="font-size: 10px; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px;"><?= user.role ?></small>
+                </div>     
             </div>
-            
-            <div class="card" onclick="openMonitoring()">
-                <i class="fas fa-chart-pie"></i>
-                <h3>Monitoring Anggaran</h3>
-                <p>Lihat data & grafik</p>
-            </div>
-            
-            <? if (user.username === "PPK1372") { ?>
-                <div class="card" onclick="openPanel()">
-                    <i class="fas fa-users"></i>
-                    <h3>Kelola Akun</h3>
-                    <p>Manajemen user</p>
-                </div>
-                
-                <div class="card" onclick="window.open('https://drive.google.com/drive/folders/1ZqsqK1X-WnS11uH-Xr0CKoCsgkXIj6al?usp=sharing', '_blank')">
-                    <i class="fab fa-google-drive"></i>
-                    <h3>Google Drive</h3>
-                    <p>Akses Google Driver</p>
-                </div>
-            <? } ?>
-
-            <? if (user.username == "PPK1372" || user.username == "BENDAHARA1372") { ?>
-                <div class="card" onclick="alert('Sedang Pengembangan')">
-                    <i class="fas fa-chart-pie"></i>
-                    <h3>Target Minimal Penyerapan RPD</h3>
-                    <p>Target Minimal Penyerapan RPD dan perbandingan</p>
-                </div>
-            <? } ?>
-
-            <? if (user.username == "BENDAHARA1372") { ?>
-                <div class="card" onclick="alert('Sedang Pengembangan')">
-                    <i class="fas fa-chart-pie"></i>
-                    <h3>Realisasi Anggaran</h3>
-                    <p>Input realisasi anggaran</p>
-                </div>
-            <? } ?>
-
-            <div class="card" onclick="alert('Sedang Pengembangan')">
-                <i class="fas fa-chart-pie"></i>
-                <h3>Informasi ARUNA</h3>
-                <p>informasi penggunaan aruna</p>
-            </div>
-        </div>
-
-
-   
-
-        <div class="panel" id="inputAnggaran">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                <h3><i class="fas fa-edit"></i> Rekam Rencana Penarikan Dana</h3><br>
-                <h4><b>*Jika Rencana penarikan diatas tanggal 25, harap Rencana Penarikan Dana (RPD) diisi untuk bulan berikutnya</h4>
-                <? if (user.username === "PPK1372") { ?>
-                    <button onclick="openMasterItemPanel()" style="font-size:11px; color:white; background: #1D6F42; padding: 5px 10px; border-radius: 5px; border:none; cursor:pointer;">
-                        <i class="fas fa-edit"></i> Edit Item Kegiatan
-                    </button>
+            <div class="menu">
+                <a id="navDash" class="active" onclick="kembali()"><i class="fas fa-home"></i> Dashboard</a>
+                <a id="navInput" onclick="openInputAnggaran()"><i class="fas fa-plus-circle"></i> Rekam Rencana Penarikan Dana</a>
+                <a id="navMon" onclick="openMonitoring()"><i class="fas fa-chart-line"></i> Monitoring Anggaran</a>
+                <? if (user.username === "PPK1372") { ?> 
+                    <a id="navUser" onclick="openPanel()"><i class="fas fa-users-cog"></i> Kelola Akun</a> 
+                    <a href="https://drive.google.com/drive/folders/1ZqsqK1X-WnS11uH-Xr0CKoCsgkXIj6al?usp=sharing" target="_blank">
+                        <i class="fab fa-google-drive"></i> Google Drive
+                    </a>
                 <? } ?>
+                
+                <a class="logout" onclick="logout()">
+                    <span class="button-text">Log Out</span>
+                    <div class="icon-doorway">
+                        <i class="fas fa-door-open door"></i>
+                        <i class="fas fa-walking figure"></i>
+                    </div>
+                </a>
             </div>
-            <br>
-            <div id="msgInput" class="msg" style="display:none; padding:10px; background:#e8f5e9; color:green; margin-bottom:10px;"></div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
-                <div>
-                    <label>Nama Penanggung Jawab</label>
-                    <input id="pj" value="<?= user.nama ?>" readonly style="background:#eee; cursor: not-allowed;">
-                    <label>Item Kegiatan</label>
-                    <select id="item" style="width: 100%;">
-                        <option value="" disabled selected>-- Sedang memuat data... --</option>
-                    </select>
-                    <div style="margin-bottom: 15px;"></div> 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; align-items: end;">
-                        <div>
-                            <label>Bulan Pencairan</label>
-                            <select id="bulan">
-                                <option value="" disabled selected>-- Pilih --</option>
-                                <option value="Januari">Januari</option>
-                                <option value="Februari">Februari</option>
-                                <option value="Maret">Maret</option>
-                                <option value="April">April</option>
-                                <option value="Mei">Mei</option>
-                                <option value="Juni">Juni</option>
-                                <option value="Juli">Juli</option>
-                                <option value="Agustus">Agustus</option>
-                                <option value="September">September</option>
-                                <option value="Oktober">Oktober</option>
-                                <option value="November">November</option>
-                                <option value="Desember">Desember</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label>Tahun</label>
-                            <input id="tahun" type="number" placeholder="Contoh: 2026">
-                        </div>
-                        <div>
-                             <label>Jumlah (Rp)</label>
-                             <input id="jumlah" type="text" placeholder="0" oninput="formatNumericInput(this)">
-                        </div>
-                        
+        </div>
+
+        <div class="content">
+            
+            <div class="header-banner" id="dashHeader">
+                <div class="user-badge-card">
+                    <div style="text-align: right;">
+                        <h3 style="margin: 0; color: var(--blue); font-weight: 700;">HAI, <?= user.nama ?></h3>
                     </div>
                 </div>
-                <div style="display: flex; flex-direction: column;">
-                      <label>Keterangan</label>
-                      <textarea id="ket" style="flex: 1; resize: none; background-color: #fff8e1; border: 1px solid #ffe0b2;" placeholder="Tuliskan detail kegiatan di sini...&#10;(Contoh: Transport lokal profiling sbr kabkot, Honor petugas lapangan SKTNP Jasa tahun 2026, Perjalanan pengawasan kegiatan oleh BPS Kab/kota)"></textarea>
-                  </div>
-
-            </div> 
-            <div class="btn-group" style="margin-top: 20px;">
-                <button class="btn btn-add" onclick="lanjutKonfirmasi()">Lanjut</button>
-                <button class="btn btn-del" onclick="kembali()">Batal</button>
             </div>
-        </div>
 
-        <div class="panel" id="konfirmasiAnggaran">
-            <h3>Konfirmasi</h3>
-            <div style="background:#f8f9fa; padding:15px; border-radius:8px;">
-                <table>
-                    <tr><td width="150">Nama PJ</td><td id="c_pj"></td></tr>
-                    <tr><td>Item</td><td id="c_item" style="font-weight:bold;"></td></tr>
-                    <tr><td>Waktu</td><td id="c_waktu"></td></tr>
-                    <tr><td>Jumlah</td><td id="c_jumlah" style="font-weight:bold; color:var(--blue)"></td></tr>
-                    <tr><td>Keterangan</td><td id="c_ket"></td></tr>
-                </table>
-            </div><br>
-            <div class="btn-group">
-                <button class="btn btn-add" onclick="simpanFinal()">Simpan</button>
-                <button class="btn btn-del" onclick="batalKonfirmasi()">Kembali</button>
+            <div class="grid" id="menuGrid">
+                <div class="card" onclick="openInputAnggaran()">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <h3>Rekam Rencana Penarikan Dana</h3>
+                    <p>Ajukan penarikan dana baru</p>
+                </div>
+                
+                <div class="card" onclick="openMonitoring()">
+                    <i class="fas fa-chart-pie"></i>
+                    <h3>Monitoring Anggaran</h3>
+                    <p>Lihat data & grafik</p>
+                </div>
+                
+                <? if (user.username === "PPK1372") { ?>
+                    <div class="card" onclick="openPanel()">
+                        <i class="fas fa-users"></i>
+                        <h3>Kelola Akun</h3>
+                        <p>Manajemen user</p>
+                    </div>
+                <? } ?>
+
+                <? if (user.username === "PPK1372" || user.role ==="admin") { ?>    
+                    <div class="card" onclick="window.open('https://drive.google.com/drive/folders/1ZqsqK1X-WnS11uH-Xr0CKoCsgkXIj6al?usp=sharing', '_blank')">
+                        <i class="fab fa-google-drive"></i>
+                        <h3>Google Drive</h3>
+                        <p>Akses Google Driver</p>
+                    </div>
+                <? } ?>
+
+                <? if (user.username == "PPK1372" || user.username == "BENDAHARA1372" | user.role == "admin") { ?>
+                    <div class="card" onclick="openTargetRPD()">
+                        <i class="fas fa-chart-pie"></i>
+                        <h3>Target Minimal Penyerapan RPD</h3>
+                        <p>Target Minimal Penyerapan RPD dan perbandingan</p>
+                    </div>
+                <? } ?>
+
+                <div class="card" onclick="openInformasi()">
+                    <i class="fas fa-info-circle"></i>
+                    <h3>Informasi ARUNA</h3>
+                    <p>Informasi aplikasi</p>
+                </div>
             </div>
-        </div>
-
-
-
-        <div class="panel" id="panelMasterItem">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-        <h3><i class="fas fa-database"></i> Kelola Master Item</h3>
-        <button class="btn btn-add" onclick="bukaModalMaster('', '', '')"><i class="fas fa-plus"></i> Tambah Item</button>
-    </div>
-    <div style="background-color: #fff3cd; padding: 10px; border-radius: 5px; font-size: 12px; margin-bottom: 20px; border: 1px solid #ffeeba; color: #856404;">
-        <strong><i class="fas fa-info-circle"></i> KETENTUAN FORMAT:</strong><br>
-        Gunakan pemisah titik (.) dan tanda hubung (-) dengan benar.<br>
-        Contoh Benar: <b>WA.2886.EBD.52-Layanan Reformasi Kinerja</b>
-    </div>
-    <div class="table-responsive">
-        <table id="tabelMaster" class="display" style="width:100%">
-            <thead>
-                <tr>
-                    <th>Nama Item Kegiatan</th>
-                    <th style="text-align:right;">Pagu Anggaran</th>
-                    <th style="text-align:center;">Aksi</th>
-                </tr>
-            </thead>
-            <tbody id="bodyMasterItem"></tbody>
-        </table>
-    </div>
-    <br><button class="btn btn-del" onclick="kembaliKeInput()">Kembali</button>
-</div>
-
-<div id="modalMasterEdit" class="modal-overlay">
-  <div class="modal-box">
-    <span class="close-btn" onclick="tutupModalMaster()">&times;</span>
-    <div class="modal-header"><i class="fas fa-pen-square"></i> Form Master Item</div>
-    <input type="hidden" id="master_rowIndex">
-    <label>Nama Item Kegiatan</label>
-    <textarea id="master_item" rows="3" placeholder="Contoh: WA.2886.EBD.52-Nama Item"></textarea>
-    <small style="color:gray; display:block; margin-bottom:10px;">*Format: Program.Kegiatan.Output.Jenbel-Item  <br>Ex: WA.2886.EBD.52-Publikasi Statistik XYZ</small>
-    <label>Pagu Anggaran (Rp)</label>
-    <input type="text" id="master_pagu" oninput="formatNumericInput(this)" placeholder="0">
-    <div style="text-align:right; margin-top:15px;">
-      <button class="btn btn-del" onclick="tutupModalMaster()">Batal</button>
-      <button class="btn btn-add" onclick="simpanMasterItem()">Simpan</button>
-    </div>
-  </div>
-</div>
-
-        <div class="panel" id="monitoring">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
-        <h3><i class="fas fa-chart-bar"></i> Monitoring</h3>
-        
-        <? if (user.username == "PPK1372") { ?>
-            <button class="btn" style="background-color: #107c41;" onclick="window.open('https://docs.google.com/spreadsheets/d/1nYki_KwwQdPpIlE7A-TOhFO1-jucrwOTmrM3SJnha3o/edit?usp=sharing', '_blank')">
-                <i class="fas fa-table"></i> Cek Data (Spreadsheet)
-            </button>
-        <? } ?>
-    </div>
-
-    <div class="filter-section"> 
-          <label for="filterTahun"><i class="fas fa-filter"></i> Filter:</label>
-          <select id="filterTahun">
-              <option value="">Semua Tahun</option>
-          </select>
-          <select id="filterBulan">
-              <option value="">Semua Bulan</option>
-              <option value="Januari">Januari</option>
-              <option value="Februari">Februari</option>
-              <option value="Maret">Maret</option>
-              <option value="April">April</option>
-              <option value="Mei">Mei</option>
-              <option value="Juni">Juni</option>
-              <option value="Juli">Juli</option>
-              <option value="Agustus">Agustus</option>
-              <option value="September">September</option>
-              <option value="Oktober">Oktober</option>
-              <option value="November">November</option>
-              <option value="Desember">Desember</option>
-          </select>
-      </div>
-
-    <h3><i class="fas fa-chart-bar"></i> Monitoring Anggaran</h3>
-    <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:15px; margin-bottom:20px;">
-      
-       <div class="score-card">
-           <div class="score-title">Total Pagu</div>
-           <div class="score-value" id="valPagu" style="color:var(--blue-dark)">Rp 0</div>
-       </div>
-       <div class="score-card">
-           <div class="score-title">Total RPD (user PJ)</div>
-           <div class="score-value" id="valRealisasi" style="color:var(--warning)">Rp 0</div>
-       </div>
-       <div class="score-card">
-           <div class="score-title">Selisih (SISA)</div>
-           <div class="score-value" id="valSisa" style="color:var(--success)">Rp 0</div>
-       </div>
-    </div>
-
-    <h3><i class="fas fa-chart-bar"></i> Monitoring Realisasi</h3>
-    <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:15px; margin-bottom:20px;">
-      
-       <div class="score-card">
-           <div class="score-title">Total RPD</div>
-           <div class="score-value" id="valRealisasi2" style="color:var(--blue-dark)">Rp 0</div>
-       </div>
-       <div class="score-card">
-           <div class="score-title">Total Realisasi</div>
-           <div class="score-value" id="x" style="color:var(--warning)">Rp -</div>
-       </div>
-       <div class="score-card">
-           <div class="score-title">Selisih (SISA)</div>
-           <div class="score-value" id="x" style="color:var(--success)">Rp -</div>
-       </div>
-    </div>
-    
-    <div class="table-responsive" style="margin-bottom: 35px; border: 1px solid var(--blue);">
-        <table style="width: 100%; border-collapse: collapse;">
-            <thead>
-                <tr style="background: var(--blue-dark); color: white; font-size: 13px;">
-                    <th style="padding: 10px; text-align: center;">Kode</th>
-                    <th style="padding: 10px; text-align: right;">Total RPD</th>
-                    <th style="padding: 10px; text-align: right;">Total Realisasi</th>
-                    <th style="padding: 10px; text-align: right;">Selisih (Sisa)</th>
-                </tr>
-            </thead>
-            <tbody id="bodyRingkasanKode">
-            </tbody>
-        </table>
-    </div>
-
-    <h4 style="margin-bottom: 15px; color: var(--blue-dark); border-bottom: 2px solid #eee; padding-bottom: 8px;">
-        <i class="fas fa-list"></i> Detail Transaksi
-    </h4>
-    <div class="table-responsive" id="printArea" style="margin-bottom: 50px;">
-        <table id="tabelMon"></table>
-    </div>
-    <h4 style="margin-bottom: 15px; color: var(--blue-dark); border-bottom: 2px solid #eee; padding-bottom: 8px;">
-        <i class="fas fa-table"></i> Tabel Rencana Penarikan Dana
-    </h4>
-    
-    <div class="matrix-controls">
-        <input type="text" id="searchMatrix" class="search-box-matrix" placeholder="Cari Kode Program / Kegiatan..." onkeyup="searchTableMatrix()">
-        <? if (user.username == "PPK1372" || user.username == "BENDAHARA1372") { ?>
-            <button class="btn btn-excel" onclick="downloadXLSX()" style="margin-top:0"><i class="fas fa-file-excel"></i> Export Excel (XLSX)</button>
-        <? } ?>
-    </div>
-
-    <div class="table-responsive" style="margin-bottom: 40px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-radius: 8px; max-height: 600px; overflow-y: auto;">
-        <table id="tabelRekap">
-            <thead>
-                <tr>
-                    <th class="sticky">Program</th>
-                    <th class="sticky">Kegiatan</th>
-                    <th class="sticky">Output</th>
-                    <th class="sticky">Jenbel</th>
-                    
-                    <th>Pagu</th>
-                    <th>Jumlah RPD</th> 
-                    <th>Sisa Anggaran</th>
-                    
-                    <th>Januari</th>
-                    <th>Februari</th>
-                    <th>Maret</th>
-                    <th>April</th>
-                    <th>Mei</th>
-                    <th>Juni</th>
-                    <th>Juli</th>
-                    <th>Agustus</th>
-                    <th>September</th>
-                    <th>Oktober</th>
-                    <th>November</th>
-                    <th>Desember</th>
-                </tr>
-            </thead>
-            <tbody id="bodyRekap">
-                </tbody>
-        </table>
-    </div>
-
-    <br><button class="btn btn-del" onclick="kembali()">Tutup</button>
-</div>
-
             
 
+                <div class="panel" id="panelTargetRPD">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <h3><i class="fas fa-chart-pie"></i> Target Minimal Penyerapan RPD</h3>
+                    <div class="filter-section" style="margin-bottom: 0; padding: 5px 10px;"> 
+                        <label for="filterTahunTarget"><i class="fas fa-filter"></i> Filter:</label>
+                        <select id="filterTahunTarget" onchange="syncFilterTarget()">
+                            <option value="">Semua Tahun</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-excel" onclick="downloadTargetExcel()" style="margin-top: 0;">
+                        <i class="fas fa-file-excel"></i> Export Excel (XLSX)
+                    </button>
+                </div>
+                
+                <div style="background: #f4f7fb; padding: 15px; border-radius: 8px; margin-bottom: 25px; border: 1px solid #ddd;">
+                    <h4 style="margin-top:0; margin-bottom: 10px; color: var(--blue-dark);"><i class="fas fa-cog"></i> Atur Persentase Target</h4>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; font-size: 13px;">
+                        <div><b>TW 1:</b> 51: <input type="number" id="pct_t1_51" value="10" style="width:50px; padding:4px; margin:0;" onchange="calculateTargetRPD()">% | 52: <input type="number" id="pct_t1_52" value="15" style="width:50px; padding:4px; margin:0;" onchange="calculateTargetRPD()">%</div>
+                        <div><b>TW 2:</b> 51: <input type="number" id="pct_t2_51" value="40" style="width:50px; padding:4px; margin:0;" onchange="calculateTargetRPD()">% | 52: <input type="number" id="pct_t2_52" value="40" style="width:50px; padding:4px; margin:0;" onchange="calculateTargetRPD()">%</div>
+                        <div><b>TW 3:</b> 51: <input type="number" id="pct_t3_51" value="60" style="width:50px; padding:4px; margin:0;" onchange="calculateTargetRPD()">% | 52: <input type="number" id="pct_t3_52" value="60" style="width:50px; padding:4px; margin:0;" onchange="calculateTargetRPD()">%</div>
+                        <div><b>TW 4:</b> 51: <input type="number" id="pct_t4_51" value="90" style="width:50px; padding:4px; margin:0;" onchange="calculateTargetRPD()">% | 52: <input type="number" id="pct_t4_52" value="90" style="width:50px; padding:4px; margin:0;" onchange="calculateTargetRPD()">%</div>
+                    </div>
+                </div>
 
+                <div id="targetRPDContainer" class="target-container">
+                    </div>
 
-      <div class="panel" id="panel">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                  <h3><i class="fas fa-user-shield"></i> Kelola Akun</h3>
-                  
-                  <button class="btn btn-excel" onclick="window.open('https://docs.google.com/spreadsheets/d/1I_ep09_tnTSqycD_HL6kXXZchhkDYk8tGvcdqRX5Z7U/edit?usp=sharing', '_blank')">
-                      <i class="fas fa-file-excel"></i> Database Akun
-                  </button>
-              </div>
-              <p id="jumlahTxt"></p>
-
-              <div class="table-responsive"><table id="tabel"></table></div>
-           
-              <hr>
-              <h4>Tambah Akun</h4>
-              <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap:10px;">
-                <input id="u" placeholder="Username"><input id="p" placeholder="Password">
-                <input id="n" placeholder="Nama"><input id="j" placeholder="Jabatan">
-                <select id="r"><option value="user">User</option><option value="admin">Admin</option></select>
+                <br><button class="btn btn-del" onclick="kembali()"><i class="fas fa-arrow-left"></i> Kembali</button>
             </div>
-              
-              <div style="margin-top: 15px;"> <button class="btn btn-add" onclick="tambah()">Tambah</button>
-                  
-                  <span id="msgSukses" style="display:none; color: #28a745; margin-left: 10px; font-weight: bold;">
-                      <i class="fas fa-check-circle"></i> Akun berhasil dibuat
-                  </span>
-              </div>
-              
-          </div>
+
+            <div class="panel" id="panelInformasi">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <h3><i class="fas fa-info-circle"></i> Informasi ARUNA</h3>
+                </div>
+                
+                <div style="background: #eaf3ff; padding: 25px; border-radius: 12px; border-left: 5px solid var(--blue); margin-bottom: 25px;">
+                    <h3 style="color: var(--blue-dark); margin-top: 0; margin-bottom: 10px;">ARUNA</h3>
+                    <h4 style="margin: 0 0 10px 0; color: #555;">(Akurasi RPD Unggul, Niscaya Akuntabel)</h4>
+                    <p style="font-size: 14px; line-height: 1.6; margin-bottom: 0;">
+                        Website manajemen rencana penarikan anggaran, real-time, dan mudah digunakan. Dikembangkan menggunakan Google Appscript yang saling terintegrasi dengan lingkungan Google Workspace seperti Google Drive, Gmail, dan Google Spreadsheet.
+                    </p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                    <div style="border: 1px solid #eee; padding: 20px; border-radius: 12px; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
+                        <h4 style="margin-top: 0; color: var(--blue-dark); border-bottom: 2px solid #eee; padding-bottom: 10px;">
+                            <i class="fas fa-laptop-code"></i> Teknologi
+                        </h4>
+                        <ul style="list-style: none; padding: 0; margin: 0; font-size: 14px;">
+                            <li style="margin-bottom: 15px; display: flex; align-items: center; gap: 15px;">
+                                <i class="fab fa-js-square" style="color: #f7df1e; font-size: 28px;"></i> 
+                                <span><b>GS</b><br><small style="color:gray;">(Google Apps Script based on JavaScript)</small></span>
+                            </li>
+                            <li style="margin-bottom: 15px; display: flex; align-items: center; gap: 15px;">
+                                <i class="fab fa-html5" style="color: #e34f26; font-size: 28px;"></i> 
+                                <b>HTML</b>
+                            </li>
+                            <li style="display: flex; align-items: center; gap: 15px;">
+                                <i class="fab fa-css3-alt" style="color: #1572b6; font-size: 28px;"></i> 
+                                <b>CSS</b>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div style="border: 1px solid #eee; padding: 20px; border-radius: 12px; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
+                        <h4 style="margin-top: 0; color: var(--blue-dark); border-bottom: 2px solid #eee; padding-bottom: 10px;">
+                            <i class="fas fa-user-tie"></i> Developer
+                        </h4>
+                        <div style="font-size: 14px; line-height: 1.6;">
+                            <strong style="font-size: 16px; color: var(--blue-dark);">Alber Analafean</strong><br>
+                            <span style="color: #444; font-weight: 500;">Asisten Pranata Komputer BPS Kota Solok</span><br>
+                            <em style="font-size: 12px; color: #888; display: block; margin-top: 5px; margin-bottom: 15px;">(Peserta Maganghub Kementerian Ketenagakerjaan RI Batch 3 2025)</em>
+                            
+                            <div style="background: #f8f9fa; padding: 10px; border-radius: 8px; display: inline-block;">
+                                <i class="fas fa-envelope" style="color: var(--blue); margin-right: 5px;"></i> 
+                                <a href="mailto:analafeanalber@gmail.com" style="color: var(--blue-dark); text-decoration: none; font-weight: 500;">analafeanalber@gmail.com</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-del" onclick="kembali()"><i class="fas fa-arrow-left"></i> Kembali</button>
+            </div>
+        
+
+            <div class="panel" id="inputAnggaran">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <h3><i class="fas fa-edit"></i> Rekam Rencana Penarikan Dana</h3><br>
+                    
+                    <? if (user.username === "PPK1372") { ?>
+                        <button onclick="openMasterItemPanel()" style="font-size:11px; color:white; background: #1D6F42; padding: 5px 10px; border-radius: 5px; border:none; cursor:pointer;">
+                            <i class="fas fa-edit"></i> Edit Item Kegiatan
+                        </button>
+                    <? } ?>
+                </div>
+                <br>
+                <div id="msgInput" class="msg" style="display:none; padding:10px; background:#e8f5e9; color:green; margin-bottom:10px;"></div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+                    <div>
+                        <label>Nama Penanggung Jawab</label>
+                        <input id="pj" value="<?= user.nama ?>" readonly style="background:#eee; cursor: not-allowed;">
+                        <label>Item Kegiatan</label>
+                        <select id="item" style="width: 100%;">
+                            <option value="" disabled selected>-- Sedang memuat data... --</option>
+                        </select>
+                        <div style="margin-bottom: 15px;"></div> 
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; align-items: end;">
+                            <div>
+                                <label>Bulan Pencairan</label>
+                                <select id="bulan">
+                                    <option value="" disabled selected>-- Pilih --</option>
+                                    <option value="Januari">Januari</option>
+                                    <option value="Februari">Februari</option>
+                                    <option value="Maret">Maret</option>
+                                    <option value="April">April</option>
+                                    <option value="Mei">Mei</option>
+                                    <option value="Juni">Juni</option>
+                                    <option value="Juli">Juli</option>
+                                    <option value="Agustus">Agustus</option>
+                                    <option value="September">September</option>
+                                    <option value="Oktober">Oktober</option>
+                                    <option value="November">November</option>
+                                    <option value="Desember">Desember</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Tahun</label>
+                                <input id="tahun" type="number" placeholder="Contoh: 2026">
+                            </div>
+                            <div>
+                                 <label>Jumlah (Rp)</label>
+                                 <input id="jumlah" type="text" placeholder="0" oninput="formatNumericInput(this)">
+                            </div>
+                            
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column;">
+                          <label>Keterangan</label>
+                          <textarea id="ket" style="flex: 1; resize: none; background-color: #fff8e1; border: 1px solid #ffe0b2;" placeholder="Tuliskan detail kegiatan di sini...&#10;(Contoh: Transport lokal profiling sbr kabkot, Honor petugas lapangan SKTNP Jasa tahun 2026, Perjalanan pengawasan kegiatan oleh BPS Kab/kota)"></textarea>
+                      </div>
+
+            </div> 
+                <div style="margin-top: 20px; margin-bottom: 10px; color: var(--danger); font-size: 13px; font-weight: 600; font-style: italic;">
+                    *Jika Rencana penarikan di atas tanggal 25, harap Rencana Penarikan Dana (RPD) diisi untuk bulan berikutnya
+                </div>
+                <div class="btn-group" style="margin-top: 20px;">
+                    <button class="btn btn-add" onclick="lanjutKonfirmasi()">Lanjut</button>
+                    <button class="btn btn-del" onclick="kembali()">Batal</button>
+                </div>
+            </div>
+
+            <div class="panel" id="konfirmasiAnggaran">
+                <h3>Konfirmasi</h3>
+                <div style="background:#f8f9fa; padding:15px; border-radius:8px;">
+                    <table>
+                        <tr><td width="150">Nama PJ</td><td id="c_pj"></td></tr>
+                        <tr><td>Item</td><td id="c_item" style="font-weight:bold;"></td></tr>
+                        <tr><td>Waktu</td><td id="c_waktu"></td></tr>
+                        <tr><td>Jumlah</td><td id="c_jumlah" style="font-weight:bold; color:var(--blue)"></td></tr>
+                        <tr><td>Keterangan</td><td id="c_ket"></td></tr>
+                    </table>
+                </div><br>
+                <div class="btn-group">
+                    <button class="btn btn-add" onclick="simpanFinal()">Simpan</button>
+                    <button class="btn btn-del" onclick="batalKonfirmasi()">Kembali</button>
+                </div>
+            </div>
+
+
+
+            <div class="panel" id="panelMasterItem">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h3><i class="fas fa-database"></i> Kelola Master Item</h3>
+            <button class="btn btn-add" onclick="bukaModalMaster('', '', '')"><i class="fas fa-plus"></i> Tambah Item</button>
+        </div>
+        <div style="background-color: #fff3cd; padding: 10px; border-radius: 5px; font-size: 12px; margin-bottom: 20px; border: 1px solid #ffeeba; color: #856404;">
+            <strong><i class="fas fa-info-circle"></i> KETENTUAN FORMAT:</strong><br>
+            Gunakan pemisah titik (.) dan tanda hubung (-) dengan benar.<br>
+            Contoh Benar: <b>WA.2886.EBD.52-Layanan Reformasi Kinerja</b>
+        </div>
+        <div class="table-responsive">
+            <table id="tabelMaster" class="display" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Nama Item Kegiatan</th>
+                        <th style="text-align:right;">Pagu Anggaran</th>
+                        <th style="text-align:center;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="bodyMasterItem"></tbody>
+            </table>
+        </div>
+        <br><button class="btn btn-del" onclick="kembaliKeInput()">Kembali</button>
     </div>
-</div>
+
+    <div id="modalMasterEdit" class="modal-overlay">
+      <div class="modal-box">
+        <span class="close-btn" onclick="tutupModalMaster()">&times;</span>
+        <div class="modal-header"><i class="fas fa-pen-square"></i> Form Master Item</div>
+        
+        <div id="msgMasterError" style="display:none; background:#ffebee; color:#c62828; padding:10px; border-radius:5px; margin-bottom:15px; font-size:12px; border-left:4px solid #c62828; line-height: 1.5;"></div>
+
+        <input type="hidden" id="master_rowIndex">
+        <label>Nama Item Kegiatan</label>
+        <textarea id="master_item" rows="3" placeholder="Contoh: WA.2886.EBD.52-Nama Item"></textarea>
+        <small style="color:gray; display:block; margin-bottom:10px;">*Format: Program.Kegiatan.Output.Jenbel-Item  <br>Ex: WA.2886.EBD.52-Publikasi Statistik XYZ</small>
+        <label>Pagu Anggaran (Rp)</label>
+        <input type="text" id="master_pagu" oninput="formatNumericInput(this)" placeholder="0">
+        <div style="text-align:right; margin-top:15px;">
+          <button class="btn btn-del" onclick="tutupModalMaster()">Batal</button>
+          <button class="btn btn-add" onclick="simpanMasterItem()">Simpan</button>
+        </div>
+      </div>
+    </div>
+
+            <div class="panel" id="monitoring">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+            <h3><i class="fas fa-chart-bar"></i> Monitoring</h3>
+            
+            <? if (user.username == "PPK1372" | user.role == "admin") { ?>
+                <button class="btn" style="background-color: #107c41;" onclick="window.open('https://docs.google.com/spreadsheets/d/1nYki_KwwQdPpIlE7A-TOhFO1-jucrwOTmrM3SJnha3o/edit?usp=sharing', '_blank')">
+                    <i class="fas fa-table"></i> Cek Data Detail Transaksi (Spreadsheet)
+                </button>
+            <? } ?>
+        </div>
+
+        <div class="filter-section"> 
+              <label for="filterTahun"><i class="fas fa-filter"></i> Filter:</label>
+              <select id="filterTahun">
+                  <option value="">Semua Tahun</option>
+              </select>
+              <select id="filterBulan">
+                  <option value="">Semua Bulan</option>
+                  <option value="Januari">Januari</option>
+                  <option value="Februari">Februari</option>
+                  <option value="Maret">Maret</option>
+                  <option value="April">April</option>
+                  <option value="Mei">Mei</option>
+                  <option value="Juni">Juni</option>
+                  <option value="Juli">Juli</option>
+                  <option value="Agustus">Agustus</option>
+                  <option value="September">September</option>
+                  <option value="Oktober">Oktober</option>
+                  <option value="November">November</option>
+                  <option value="Desember">Desember</option>
+              </select>
+          </div>
+
+        <? if (user.username === "PPK1372" || user.username === "BENDAHARA1372" || user.role === "admin") { ?>
+        <h3><i class="fas fa-chart-bar"></i> Monitoring Anggaran</h3>
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:15px; margin-bottom:20px;">
+          
+           <div class="score-card">
+               <div class="score-title">Total Pagu</div>
+               <div class="score-value" id="valPagu" style="color:var(--blue-dark)">Rp. 0</div>
+           </div>
+           <div class="score-card">
+               <div class="score-title">Total RPD (Rencana Penarikan Dana)</div>
+               <div class="score-value" id="valRealisasi" style="color:var(--warning)">Rp. 0</div>
+           </div>
+           <div class="score-card">
+               <div class="score-title">Selisih (SISA)</div>
+               <div class="score-value" id="valSisa" style="color:var(--success)">Rp. 0</div>
+           </div>
+        </div>
+        <? } ?>
+
+        <h3><i class="fas fa-chart-bar"></i> Monitoring Realisasi</h3>
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:15px; margin-bottom:20px;">
+          
+           <div class="score-card">
+               <div class="score-title">Total RPD</div>
+               <div class="score-value" id="valRealisasi2" style="color:var(--blue-dark)">Rp. 0</div>
+           </div>
+           <div class="score-card">
+        <div class="score-title">Total Realisasi</div>
+            <div class="score-value" id="valTotalRealisasi" style="color:var(--warning)">Rp. 0</div>
+        </div>
+        <div class="score-card">
+            <div class="score-title">Selisih (SISA)</div>
+            <div class="score-value" id="valSisaRealisasi" style="color:var(--success)">Rp. 0</div>
+        </div>
+        </div>
+        
+        <div class="table-responsive" style="margin-bottom: 35px; border: 1px solid var(--blue);">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: var(--blue-dark); color: white; font-size: 13px;">
+                        <th style="padding: 10px; text-align: center;">Kode</th>
+                        <th style="padding: 10px; text-align: right;">Total RPD</th>
+                        <th style="padding: 10px; text-align: right;">Total Realisasi</th>
+                        <th style="padding: 10px; text-align: right;">Selisih (Sisa)</th>
+                    </tr>
+                </thead>
+                <tbody id="bodyRingkasanKode">
+                </tbody>
+            </table>
+        </div>
+
+        <h4 style="margin-bottom: 15px; color: var(--blue-dark); border-bottom: 2px solid #eee; padding-bottom: 8px;">
+            <i class="fas fa-list"></i> Detail Transaksi
+        </h4>
+        <div class="table-responsive" id="printArea" style="margin-bottom: 50px;">
+            <table id="tabelMon"></table>
+        </div>
+
+        <? if (user.username === "PPK1372" || user.username === "BENDAHARA1372" || user.role === "admin") { ?>
+        <h4 style="margin-bottom: 15px; color: var(--blue-dark); border-bottom: 2px solid #eee; padding-bottom: 8px;">
+            <i class="fas fa-table"></i> Tabel Rencana Penarikan Dana
+        </h4>
+        
+        <div class="matrix-controls">
+            <input type="text" id="searchMatrix" class="search-box-matrix" placeholder="Cari Kode Program / Kegiatan..." onkeyup="searchTableMatrix()">
+            <? if (user.username == "PPK1372" || user.username == "BENDAHARA1372" || user.role == "admin") { ?>
+                <button class="btn btn-excel" onclick="downloadXLSX()" style="margin-top:0"><i class="fas fa-file-excel"></i> Export Excel (XLSX)</button>
+            <? } ?>
+        </div>
+
+        <div class="table-responsive" style="margin-bottom: 40px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-radius: 8px; max-height: 600px; overflow-y: auto;">
+            <table id="tabelRekap">
+                <thead>
+                    <tr>
+                        <th class="sticky">Program</th>
+                        <th class="sticky">Kegiatan</th>
+                        <th class="sticky">Output</th>
+                        <th class="sticky">Jenbel</th>
+                        
+                        <th>Pagu</th>
+                        <th>Jumlah RPD</th> 
+                        <th>Sisa Anggaran</th>
+                        
+                        <th>Januari</th>
+                        <th>Februari</th>
+                        <th>Maret</th>
+                        <th>April</th>
+                        <th>Mei</th>
+                        <th>Juni</th>
+                        <th>Juli</th>
+                        <th>Agustus</th>
+                        <th>September</th>
+                        <th>Oktober</th>
+                        <th>November</th>
+                        <th>Desember</th>
+                    </tr>
+                </thead>
+                <tbody id="bodyRekap">
+                    </tbody>
+            </table>
+        </div>
+        <? } ?>
+        
+        <div class="tabel-rpd-container">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top: 40px; margin-bottom: 10px;">
+                <h3 style="margin: 0; color: var(--blue-dark);"><i class="fas fa-list-alt"></i> Detail Rincian RPD per Triwulan</h3>
+                <button class="btn btn-excel" onclick="downloadRincianExcel()">
+                    <i class="fas fa-file-excel"></i> Export Rincian (XLSX)
+                </button>
+            </div>
+            <div class="judul-tabel">RINCIAN RPD TRIWULAN 1</div>
+            <table class="tabel-rpd">
+              <thead>
+                <tr>
+                  <th rowspan="2">KODE</th>
+                  <th colspan="2">JANUARI</th>
+                  <th colspan="2">FEBRUARI</th>
+                  <th colspan="2">MARET</th>
+                  <th rowspan="2">JUMLAH</th>
+                </tr>
+                <tr><th>51</th><th>52</th><th>51</th><th>52</th><th>51</th><th>52</th></tr>
+              </thead>
+              <tbody id="tbody-tw1">
+                </tbody>
+            </table>
+
+            <div class="judul-tabel">RINCIAN RPD TRIWULAN 2</div>
+            <table class="tabel-rpd">
+              <thead>
+                <tr>
+                  <th rowspan="2">KODE</th>
+                  <th colspan="2">APRIL</th>
+                  <th colspan="2">MEI</th>
+                  <th colspan="2">JUNI</th>
+                  <th rowspan="2">JUMLAH</th>
+                </tr>
+                <tr><th>51</th><th>52</th><th>51</th><th>52</th><th>51</th><th>52</th></tr>
+              </thead>
+              <tbody id="tbody-tw2"></tbody>
+            </table>
+
+            <div class="judul-tabel">RINCIAN RPD TRIWULAN 3</div>
+            <table class="tabel-rpd">
+              <thead>
+                <tr>
+                  <th rowspan="2">KODE</th>
+                  <th colspan="2">JULI</th>
+                  <th colspan="2">AGUSTUS</th>
+                  <th colspan="2">SEPTEMBER</th>
+                  <th rowspan="2">JUMLAH</th>
+                </tr>
+                <tr><th>51</th><th>52</th><th>51</th><th>52</th><th>51</th><th>52</th></tr>
+              </thead>
+              <tbody id="tbody-tw3"></tbody>
+            </table>
+          </div>
+
+          <div class="judul-tabel">RINCIAN RPD TRIWULAN 4</div>
+          <table class="tabel-rpd">
+            <thead>
+              <tr>
+                <th rowspan="2">KODE</th>
+                <th colspan="2">OKTOBER</th>
+                <th colspan="2">NOVEMBER</th>
+                <th colspan="2">DESEMBER</th>
+                <th rowspan="2">JUMLAH</th>
+              </tr>
+              <tr><th>51</th><th>52</th><th>51</th><th>52</th><th>51</th><th>52</th></tr>
+            </thead>
+            <tbody id="tbody-tw4"></tbody>
+          </table>
+
+        <br><button class="btn btn-del" onclick="kembali()">Tutup</button>
+    </div>
+
+                
+
+
+
+          <div class="panel" id="panel">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                      <h3><i class="fas fa-user-shield"></i> Kelola Akun</h3>
+                      
+                      <button class="btn btn-excel" onclick="window.open('https://docs.google.com/spreadsheets/d/1I_ep09_tnTSqycD_HL6kXXZchhkDYk8tGvcdqRX5Z7U/edit?usp=sharing', '_blank')">
+                          <i class="fas fa-file-excel"></i> Database Akun
+                      </button>
+                  </div>
+                  <p id="jumlahTxt"></p>
+
+                  <div class="table-responsive"><table id="tabel"></table></div>
+               
+                  <hr>
+                  <h4>Tambah Akun</h4>
+                  <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap:10px;">
+                    <input id="u" placeholder="Username"><input id="p" placeholder="Password">
+                    <input id="n" placeholder="Nama"><input id="j" placeholder="Jabatan">
+                    <select id="r"><option value="user">User</option><option value="admin">Admin</option></select>
+                </div>
+                  
+                  <div style="margin-top: 15px;"> <button class="btn btn-add" onclick="tambah()">Tambah</button>
+                      
+                      <span id="msgSukses" style="display:none; color: #28a745; margin-left: 10px; font-weight: bold;">
+                          <i class="fas fa-check-circle"></i> Akun berhasil dibuat
+                      </span>
+                  </div>
+                  
+              </div>
+        </div>
+    </div>
 
 </div> </div> <div class="footer" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; text-align: right; background-color: rgba(255,255,255,0.9); padding: 10px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
     <span style="display: block; text-align: center; font-size: 14px; font-weight: bold; color: #333;"> Perlu Bantuan?</span>
@@ -798,6 +1132,24 @@ let globalTotalPagu = 0;
 let globalRowData = []; 
 let tempRowIndex = null; // Variabel penting untuk hapus
 
+$.fn.dataTable.ext.search.push(
+    function(settings, data, dataIndex) {
+        // Mencegah filter ini merusak tabel Master Item
+        if (settings.nTable.id !== 'tabelMon') {
+            return true; 
+        }
+        
+        var selectedYear = $('#filterTahun').val();
+        var selectedMonth = $('#filterBulan').val();
+        var rowYear = data[1];  
+        var rowMonth = data[5]; 
+        var matchYear = (selectedYear === "" || rowYear == selectedYear);
+        var matchMonth = (selectedMonth === "" || rowMonth == selectedMonth);
+        return matchYear && matchMonth; 
+    }
+);
+
+
 // --- FUNGSI NAVIGASI ---
 function kembali(){
   document.querySelectorAll('.panel').forEach(p => p.style.display='none');
@@ -807,7 +1159,27 @@ function kembali(){
   document.getElementById('navDash').classList.add('active');
 }
 
-function logout(){ google.script.run.withSuccessHandler(h=>{ document.open();document.write(h);document.close(); }).logout(); }
+// Cari baris ini dan ganti total:
+function logout() {
+    // Menampilkan loading sederhana sebelum logout
+    const logoutBtn = document.querySelector('.logout');
+    logoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging out...';
+    
+    // Memanggil fungsi logout di code.gs
+    google.script.run
+        .withSuccessHandler(function(html) {
+            // Mengganti seluruh konten halaman dengan halaman login/awal
+            document.open();
+            document.write(html);
+            document.close();
+        })
+        .withFailureHandler(function(err) {
+            alert("Logout gagal: " + err.message);
+        })
+        .logout(); // Pastikan di code.gs Anda sudah ada function logout()
+}
+
+
 function numberWithCommas(x){ return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
 
 function formatNumericInput(el) {
@@ -837,32 +1209,31 @@ function kembaliKeInput() {
 }
 
 function loadMasterTable() {
-    // 1. Ambil elemen body tabel
     const tbody = document.getElementById('bodyMasterItem');
-    
-    // 2. Tampilkan animasi loading agar user tahu proses sedang berjalan
     tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px;"><i class="fas fa-spinner fa-spin"></i> Memuat data terbaru...</td></tr>';
 
     google.script.run.withSuccessHandler(data => {
         let html = "";
-        
-        // Hancurkan DataTable lama sebelum membuat yang baru
         if ($.fn.DataTable.isDataTable('#tabelMaster')) { 
             $('#tabelMaster').DataTable().destroy(); 
         }
 
         if (!data || data.length === 0) {
-            // Jika data kosong dari server
             html = '<tr><td colspan="3" style="text-align:center; padding:20px; color:red;">Harap Refresh Halaman website ini</td></tr>';
         } else {
             data.forEach((row) => {
                 let safeItem = row.item.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                
+                // Tambahkan ID unik pada <td> aksi untuk menampung konfirmasi inline
                 html += `<tr>
                     <td style="font-size:12px;">${row.item}</td>
-                    <td style="text-align:right;">Rp ${numberWithCommas(row.pagu)}</td>
-                    <td style="text-align:center;">
+                    <td style="text-align:right;">Rp. ${numberWithCommas(row.pagu)}</td>
+                    <td id="aksi_master_${row.rowIndex}" style="text-align:center; white-space:nowrap;">
                         <button class="btn-save-inline" onclick="bukaModalMaster('${row.rowIndex}', '${safeItem}', '${row.pagu}')">
                             <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn-cancel-inline" style="background:#e53935; color:white; margin-left:5px;" onclick="tanyaHapusMaster('${row.rowIndex}')">
+                            <i class="fas fa-trash"></i> Hapus
                         </button>
                     </td>
                 </tr>`;
@@ -871,13 +1242,12 @@ function loadMasterTable() {
         
         tbody.innerHTML = html;
         
-        // Inisialisasi DataTable dengan pesan kustom
         if (data && data.length > 0) { 
             $('#tabelMaster').DataTable({ 
                 "pageLength": 10, 
                 "language": { 
                     "search": "Cari Item:",
-                    "zeroRecords": "Harap Refresh Halaman website ini", // Pesan jika hasil pencarian kosong
+                    "zeroRecords": "Tidak ada item yang cocok", 
                     "infoEmpty": "Tidak ada data tersedia",
                 } 
             }); 
@@ -885,39 +1255,100 @@ function loadMasterTable() {
     }).getMasterItemData();
 }
 
+// --- FUNGSI BARU UNTUK HAPUS INLINE ---
+
+function tanyaHapusMaster(rowIndex) {
+    // Ubah kolom aksi menjadi tombol konfirmasi Ya / Batal
+    let cell = document.getElementById(`aksi_master_${rowIndex}`);
+    cell.innerHTML = `
+        <div style="display:flex; gap:5px; justify-content:center; align-items:center;">
+            <span style="font-size:11px; color:#c62828; font-weight:bold;">Yakin hapus?</span>
+            <button class="btn-save-inline" style="background:#c62828; padding:4px 8px;" onclick="eksekusiHapusMaster('${rowIndex}')">Ya</button>
+            <button class="btn-cancel-inline" style="padding:4px 8px;" onclick="loadMasterTable()">Batal</button>
+        </div>
+    `;
+}
+
+function eksekusiHapusMaster(rowIndex) {
+    let cell = document.getElementById(`aksi_master_${rowIndex}`);
+    cell.innerHTML = `<i class="fas fa-spinner fa-spin" style="color:#c62828;"></i> Menghapus...`;
+
+    // Memanggil fungsi hapus di backend (Code.gs)
+    google.script.run.withSuccessHandler(res => {
+        if (res.status === 'success') {
+            // Tampilkan Modal Sukses (M-Banking style)
+            document.querySelector('#modalSuccess .success-title').innerText = "Berhasil Dihapus!";
+            document.querySelector('#modalSuccess .success-desc').innerText = "Data Master Item telah dihapus secara permanen.";
+            document.getElementById('modalSuccess').style.display = 'flex';
+            
+            loadMasterTable(); // Refresh tabel
+        } else {
+            // Jika gagal, tampilkan pesan error inline
+            cell.innerHTML = `<span style="color:red; font-size:11px;">Gagal: ${res.message}</span>`;
+            setTimeout(() => { loadMasterTable(); }, 2000); // refresh otomatis setelah 2 detik
+        }
+    }).deleteMasterItemData(rowIndex);
+}
+
 function bukaModalMaster(index, nama, pagu) {
     document.getElementById('master_rowIndex').value = (index === '') ? '' : index; 
     document.getElementById('master_item').value = nama || '';
     document.getElementById('master_pagu').value = pagu ? numberWithCommas(pagu) : '';
+    
+    // Pastikan pesan error tersembunyi setiap kali modal baru dibuka
+    const msgError = document.getElementById('msgMasterError');
+    if(msgError) msgError.style.display = 'none';
+
     document.getElementById('modalMasterEdit').style.display = 'flex';
 }
 
 function tutupModalMaster() { document.getElementById('modalMasterEdit').style.display = 'none'; }
 
 function simpanMasterItem() {
-    const itemVal = document.getElementById('master_item').value;
+    const itemVal = document.getElementById('master_item').value.trim();
     const paguVal = document.getElementById('master_pagu').value.replace(/\./g, ""); 
     const rowIndex = document.getElementById('master_rowIndex').value;
+    const msgError = document.getElementById('msgMasterError');
 
-    if(itemVal.trim() === "" || paguVal === "") { alert("Data tidak boleh kosong!"); return; }
+    // Sembunyikan pesan error sebelumnya (jika ada) saat klik simpan
+    msgError.style.display = 'none';
+
+    if(itemVal === "" || paguVal === "") { 
+        msgError.innerHTML = '<i class="fas fa-exclamation-circle"></i> Data (Nama Item dan Pagu) tidak boleh kosong!';
+        msgError.style.display = 'block';
+        return; 
+    }
     
-    // MODAL KONFIRMASI
-    let konfirmasi = confirm("Item dan Pagu yang edit sudah benar? jika sudah simpan");
-    if (!konfirmasi) return;
+    // --- VALIDASI FORMAT NAMA ITEM ---
+    const formatRegex = /^[^.-]+\.[^.-]+\.[^.-]+\.[^.-]+-.+$/;
+    
+    if (!formatRegex.test(itemVal)) {
+        msgError.innerHTML = '<i class="fas fa-times-circle"></i> <b>FORMAT NAMA ITEM SALAH!</b><br>Pastikan penulisan sesuai standar: <i>Program.Kegiatan.Output.Jenbel-Item</i><br>Contoh yang benar: WA.2886.EBD.52-Publikasi Statistik';
+        msgError.style.display = 'block';
+        return; 
+    }
 
+    // Lanjut proses simpan jika lolos validasi
     const btn = document.querySelector('#modalMasterEdit .btn-add');
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...'; 
     btn.disabled = true;
 
     google.script.run.withSuccessHandler(res => {
         btn.innerHTML = 'Simpan'; btn.disabled = false;
+        
         if (res.status === 'success') {
-            tutupModalMaster();
-            document.querySelector('#modalSuccess .success-title').innerText = "Berhasil Update!";
+            tutupModalMaster(); // Tutup form
+            
+            // Panggil Modal Sukses gaya M-Banking
+            document.querySelector('#modalSuccess .success-title').innerText = "Berhasil Disimpan!";
+            document.querySelector('#modalSuccess .success-desc').innerText = "Data Master Item telah sukses diperbarui di dalam sistem.";
             document.getElementById('modalSuccess').style.display = 'flex';
-            loadMasterTable(); // Refresh otomatis
+            
+            loadMasterTable(); // Refresh tabel master otomatis
         } else {
-            alert("Gagal: " + res.message);
+            // Tampilkan error dari server ke div inline
+            msgError.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Gagal: ' + res.message;
+            msgError.style.display = 'block';
         }
     }).saveMasterItemData({ rowIndex: rowIndex, item: itemVal, pagu: paguVal });
 }
@@ -963,7 +1394,7 @@ function lanjutKonfirmasi(){
     document.getElementById('c_pj').innerText = elPj.value;
     document.getElementById('c_item').innerText = elItem.value;
     document.getElementById('c_waktu').innerText = elBulan.value + " " + elTahun.value; 
-    document.getElementById('c_jumlah').innerText = "Rp " + numberWithCommas(elJml.value); 
+    document.getElementById('c_jumlah').innerText = "Rp. " + numberWithCommas(elJml.value); 
     document.getElementById('c_ket').innerText = elKet.value || "-";
     document.getElementById('inputAnggaran').style.display = 'none'; 
     document.getElementById('konfirmasiAnggaran').style.display = 'block';
@@ -1017,8 +1448,22 @@ function openMonitoring(){
     loadMonitoring(); 
 }
 
-$('#filterTahun').on('change', function() { var table = $('#tabelMon').DataTable(); table.draw(); });
-$('#filterBulan').on('change', function() { var table = $('#tabelMon').DataTable(); table.draw(); });
+$('#filterTahun').on('change', function() { 
+    var table = $('#tabelMon').DataTable(); 
+    table.draw(); 
+    updateTabelTriwulanFilter(); 
+    
+    // --- TAMBAHAN SINKRONISASI ---
+    let targetFilter = document.getElementById('filterTahunTarget');
+    if (targetFilter) targetFilter.value = $(this).val();
+});
+
+$('#filterBulan').on('change', function() { 
+    var table = $('#tabelMon').DataTable(); 
+    table.draw(); 
+    updateTabelTriwulanFilter(); // <-- Panggil fungsi filter tabel RPD
+});
+
 
 function searchTableMatrix() {
   var input, filter, table, tr, td, i;
@@ -1046,16 +1491,18 @@ function loadMonitoring(){
         globalRowData = res.rows; 
 
         // Update Kartu Atas
-        document.getElementById('valPagu').innerText = "Rp " + numberWithCommas(res.totalPagu);
-        document.getElementById('valRealisasi').innerText = "Rp " + numberWithCommas(res.totalRPD);
-        document.getElementById('valSisa').innerText = "Rp " + numberWithCommas(res.sisaAnggaran);
+        if (document.getElementById('valPagu')) {
+            document.getElementById('valPagu').innerText = "Rp. " + numberWithCommas(res.totalPagu);
+            document.getElementById('valRealisasi').innerText = "Rp. " + numberWithCommas(res.totalRPD);
+            document.getElementById('valSisa').innerText = "Rp. " + numberWithCommas(res.sisaAnggaran);
+        }
 
         // Update Kartu Bawah
-        document.getElementById('valRealisasi2').innerText = "Rp " + numberWithCommas(res.totalRPD);
+        document.getElementById('valRealisasi2').innerText = "Rp. " + numberWithCommas(res.totalRPD);
         const elsX = document.querySelectorAll('#x');
         if(elsX.length >= 2) {
-             elsX[0].innerText = "Rp " + numberWithCommas(res.totalRealisasi); 
-             elsX[1].innerText = "Rp " + numberWithCommas(res.sisaRealisasi); 
+             elsX[0].innerText = "Rp. " + numberWithCommas(res.totalRealisasi); 
+             elsX[1].innerText = "Rp. " + numberWithCommas(res.sisaRealisasi); 
         }
 
         // Logic Filter Tahun
@@ -1089,15 +1536,27 @@ function loadMonitoring(){
                         <th>Bulan</th> 
                         <th>Jumlah RPD</th> 
                         <th style="background:#e8f5e9;">Realisasi</th> 
-                        <th>Ket</th>      
+                        <th>Ket</th>     
                         ${(isMaster||isAdmin||isBendahara) ? '<th>Aksi</th>' : ''}
                     </tr>
                  </thead><tbody>`;
-        
+
+
+        const currentUserNama = "<?= user.nama ?>"
         res.rows.forEach((row, idx) => {
              // ARRAY MAPPING (Sesuai update code.gs)
              // 0:Time, 1:PJ, 2:Item, 3:Bulan, 4:Tahun, 5:JmlRPD, 6:Ket, 7:User, 8:Realisasi, 9:RowIndex
              
+             // --- TAMBAHKAN LOGIKA FILTER INI ---
+             // Cek apakah data ini milik user yang sedang login (berdasarkan username atau nama PJ)
+             let isOwner = (row[7] === activeUser || row[1] === currentUserNama);
+             
+             // Jika rolenya "user" dan bukan data miliknya, maka lewati (jangan di-render)
+             if (activeRole === "user" && !isOwner) {
+                 return; 
+             }
+             // -----------------------------------
+
              let rawDate = row[0];
              let displayDate = typeof rawDate === 'string' ? rawDate.split("T")[0] : new Date(rawDate).toISOString().split('T')[0];
              let pj = row[1];
@@ -1141,7 +1600,7 @@ function loadMonitoring(){
                  }
                  
                  // Tombol Hapus (PPK & Bendahara)
-                 if(activeUser === "PPK1372" || activeUser === "BENDAHARA1372"){
+                 if(activeUser === "PPK1372" || activeUser === "BENDAHARA1372" ||activeRole === "admin"){
                     h += `<button class="btn-del" style="padding:5px 10px;" onclick="hapusMon(${realRowIndex})"><i class="fas fa-trash"></i></button>`;
                  }
 
@@ -1153,7 +1612,7 @@ function loadMonitoring(){
         tabel.innerHTML = h;
 
         // Setup DataTable Filter
-        $.fn.dataTable.ext.search.push(
+        /*$.fn.dataTable.ext.search.push(
             function(settings, data, dataIndex) {
                 var selectedYear = $('#filterTahun').val();
                 var selectedMonth = $('#filterBulan').val();
@@ -1163,7 +1622,7 @@ function loadMonitoring(){
                 var matchMonth = (selectedMonth === "" || rowMonth == selectedMonth);
                 return matchYear && matchMonth; 
             }
-        );
+        );*/
 
         $('#tabelMon').DataTable({
             "pageLength": 10,
@@ -1190,16 +1649,19 @@ function tutupConfirmDelete() {
 document.addEventListener('DOMContentLoaded', function() {
     const btnHapus = document.getElementById('btnYaHapus');
     if(btnHapus) {
+       // Cari bagian di dalam document.addEventListener('DOMContentLoaded' ...
         btnHapus.onclick = function() {
             tutupConfirmDelete();
             
-            // Panggil server side
             google.script.run.withSuccessHandler(res => {
-                loadMonitoring(); // Refresh
+                loadMonitoring(); // Refresh tabel monitoring utama
                 
+                // REFRESH TABEL TRIWULAN setelah hapus
+                google.script.run.withSuccessHandler(function(response) {
+                    renderTabelTriwulan(response.rows);
+                }).getMonitoringData();
+
                 document.querySelector('#modalSuccess .success-title').innerText = "Berhasil Dihapus!";
-                document.querySelector('#modalSuccess .success-desc').innerText = "Data telah berhasil dihapus.";
-                document.querySelector('.success-icon-circle').style.background = "#25D366"; 
                 document.getElementById('modalSuccess').style.display = 'flex';
             }).deleteAnggaran(tempRowIndex);
         };
@@ -1285,7 +1747,7 @@ function bukaEditRealisasi(index) {
 
     document.getElementById('real_rowIndex').value = realRowIndex;
     document.getElementById('real_info_item').innerText = item;
-    document.getElementById('real_info_rpd').innerText = "Rp " + numberWithCommas(jumlahRPD);
+    document.getElementById('real_info_rpd').innerText = "Rp. " + numberWithCommas(jumlahRPD);
     document.getElementById('real_jumlah').value = realisasi ? numberWithCommas(realisasi) : "";
 
     document.getElementById('modalEditRealisasi').style.display = 'flex';
@@ -1347,7 +1809,7 @@ function updateMatrixAndCharts(api) {
         // Ambil Data Realisasi (Kolom index 7 - terlihat)
         // Kita perlu membersihkan format "Rp" dan titik ribuan agar bisa dihitung
         let textReal = $(rowNode).find('td:eq(7)').text();
-        let cleanReal = textReal.replace("Rp ", "").replace(/\./g, "").replace("-", "0").trim();
+        let cleanReal = textReal.replace("Rp. ", "").replace(/\./g, "").replace("-", "0").trim();
         let valReal = parseFloat(cleanReal) || 0;
 
         let itm = $(rowNode).find('td:eq(4)').text(); 
@@ -1381,28 +1843,30 @@ function updateMatrixAndCharts(api) {
 
         htmlRingkasan += `<tr style="font-size: 14px; border-bottom: 1px solid #eee;">
             <td style="padding: 10px; text-align: center; font-weight: bold; color: var(--blue-dark);">Belanja ${k}</td>
-            <td style="padding: 10px; text-align: right; font-family: monospace;">Rp ${numberWithCommas(rpd)}</td>
-            <td style="padding: 10px; text-align: right; font-family: monospace; font-weight:bold;">Rp ${numberWithCommas(realisasi)}</td>
-            <td style="padding: 10px; text-align: right; font-family: monospace; font-weight:bold; color: ${colorSisa};">Rp ${numberWithCommas(sisa)}</td>
+            <td style="padding: 10px; text-align: right; font-family: monospace;">Rp. ${numberWithCommas(rpd)}</td>
+            <td style="padding: 10px; text-align: right; font-family: monospace; font-weight:bold;">Rp. ${numberWithCommas(realisasi)}</td>
+            <td style="padding: 10px; text-align: right; font-family: monospace; font-weight:bold; color: ${colorSisa};">Rp. ${numberWithCommas(sisa)}</td>
             </tr>`;
     });
     document.getElementById('bodyRingkasanKode').innerHTML = htmlRingkasan;
 
     // --- UPDATE KARTU ATAS & TENGAH ---
     // Update data kartu Monitoring Anggaran (Total Pagu vs RPD)
-    document.getElementById('valRealisasi').innerText = "Rp " + numberWithCommas(totalFilteredRealisasi);
-    document.getElementById('valSisa').innerText = "Rp " + numberWithCommas(globalTotalPagu - totalFilteredRealisasi);
+    // Update data kartu Monitoring Anggaran (Total Pagu vs RPD)
+    if (document.getElementById('valRealisasi')) {
+        document.getElementById('valRealisasi').innerText = "Rp. " + numberWithCommas(totalFilteredRealisasi);
+        document.getElementById('valSisa').innerText = "Rp. " + numberWithCommas(globalTotalPagu - totalFilteredRealisasi);
+    }
     
     // Update data kartu Monitoring Realisasi (Total RPD vs Realisasi)
-    if(document.getElementById('valRealisasi2')) {
-        document.getElementById('valRealisasi2').innerText = "Rp " + numberWithCommas(totalFilteredRealisasi);
+        if(document.getElementById('valRealisasi2')) {
+        document.getElementById('valRealisasi2').innerText = "Rp. " + numberWithCommas(totalFilteredRealisasi);
         
-        const elsX = document.querySelectorAll('#x');
-        if(elsX.length >= 2) {
-             // Total Realisasi
-             elsX[0].innerText = "Rp " + numberWithCommas(totalReal); 
-             // Selisih (Total RPD - Total Realisasi)
-             elsX[1].innerText = "Rp " + numberWithCommas(totalFilteredRealisasi - totalReal); 
+        if(document.getElementById('valTotalRealisasi')) {
+            document.getElementById('valTotalRealisasi').innerText = "Rp. " + numberWithCommas(totalReal); 
+        }
+        if(document.getElementById('valSisaRealisasi')) {
+            document.getElementById('valSisaRealisasi').innerText = "Rp. " + numberWithCommas(totalFilteredRealisasi - totalReal); 
         }
     }
     
@@ -1421,6 +1885,8 @@ function parseCode(itemStr) {
 
 function renderDetailedMatrix(transactions) {
     const tbody = document.getElementById('bodyRekap');
+    if (!tbody) return; // <--- Tambahkan pengaman ini agar tidak error
+
     let html = "";
     globalMasterData.forEach(master => {
         let parsed = parseCode(master.name);
@@ -1565,16 +2031,21 @@ function tambah(){
 
 // Fungsi untuk menutup modal sukses
 // Fungsi tutup modal sukses
+// Cari fungsi tutupSuccess dan pastikan isinya seperti ini:
 function tutupSuccess() {
     document.getElementById('modalSuccess').style.display = 'none';
     
     // Reset teks dan warna ke default
     document.querySelector('#modalSuccess .success-title').innerText = "Berhasil!";
     document.querySelector('#modalSuccess .success-desc').innerText = "Data berhasil diupdate dan diperbarui";
-    document.querySelector('.success-icon-circle').style.background = "#25D366";
     
-    // INI YANG PENTING AGAR REFRESH OTOMATIS
+    // REFRESH DATA UTAMA
     loadMonitoring(); 
+
+    // REFRESH TABEL TRIWULAN (Ambil data terbaru dari server)
+    google.script.run.withSuccessHandler(function(response) {
+        renderTabelTriwulan(response.rows);
+    }).getMonitoringData();
 }
 
 // Update fungsi Simpan untuk memanggil modal baru
@@ -1612,6 +2083,543 @@ function simpanPerubahan() {
         btn.innerHTML = oldText; 
         btn.disabled = false;    
     }).updateEntry(dataEdit);
+}
+
+function openInformasi(){ 
+    kembali(); 
+    document.getElementById('menuGrid').style.display='none'; 
+    document.getElementById('panelInformasi').style.display='block'; 
+}
+
+
+// --- FUNGSI EXPORT EXCEL ---
+// --- FUNGSI EXPORT EXCEL ---
+function downloadXLSX() {
+    // Ambil elemen tabel matriks berdasarkan ID
+    let tableElement = document.getElementById("tabelRekap");
+    
+    // Pastikan tabel ada sebelum dieksekusi
+    if (!tableElement) {
+        alert("Tabel tidak ditemukan!");
+        return;
+    }
+
+    // Ambil tabel menjadi workbook dengan opsi raw: true
+    let wb = XLSX.utils.table_to_book(tableElement, { sheet: "Rekap_RPD", raw: true });
+    let ws = wb.Sheets["Rekap_RPD"];
+
+    // Loop ke semua cell di Worksheet untuk memfilter angka uang
+    for (let cellRef in ws) {
+        if (cellRef[0] === '!') continue; // Abaikan metadata sheet
+        
+        let cell = ws[cellRef];
+        
+        // Cek apakah tipe datanya string
+        if (cell.t === 's' && typeof cell.v === 'string') {
+            let val = cell.v.trim();
+            
+            // Cek dengan Regex apakah string adalah angka dengan titik ribuan (contoh: "1.500.000" atau "500" atau "0")
+            if (/^-?\d{1,3}(\.\d{3})*$/.test(val)) {
+                let numVal = parseInt(val.replace(/\./g, ""), 10); // Hapus semua titik, jadikan Integer
+                
+                if (!isNaN(numVal)) {
+                    cell.t = 'n'; // Ubah tipe Excel menjadi Number
+                    cell.v = numVal; // Masukkan nilai integer aslinya
+                    cell.z = '#,##0'; // Berikan format separator ribuan Excel agar tetap rapi saat dibuka
+                }
+            }
+        }
+    }
+
+    // Buat nama file dinamis dengan tanggal
+    let today = new Date();
+    let dateStr = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, '0') + "-" + String(today.getDate()).padStart(2, '0');
+    let fileName = "Rekap_RPD_ARUNA_" + dateStr + ".xlsx";
+
+    // Generate dan download file Excel
+    XLSX.writeFile(wb, fileName);
+}
+
+// --- FUNGSI HIDE/SHOW SIDEBAR ---
+function toggleSidebar() {
+    document.querySelector('.app').classList.toggle('collapsed');
+}
+
+
+// --- TARGET MINIMAL PENYERAPAN RPD ---
+function openTargetRPD() {
+    kembali();
+    document.getElementById('menuGrid').style.display = 'none';
+    document.getElementById('panelTargetRPD').style.display = 'block';
+    
+    if (!globalMasterData || globalMasterData.length === 0) {
+        document.getElementById('targetRPDContainer').innerHTML = '<div style="padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Memuat data...</div>';
+        google.script.run.withSuccessHandler(res => {
+            globalMasterData = res.masterItems; 
+            globalRowData = res.rows;
+            copyFilterTahun(); // Sinkronkan opsi tahun
+            calculateTargetRPD();
+        }).getMonitoringData();
+    } else {
+        copyFilterTahun(); // Sinkronkan opsi tahun
+        calculateTargetRPD();
+    }
+}
+
+// FUNGSI BARU: Menyalin opsi dan nilai dari/ke Monitoring
+function copyFilterTahun() {
+    let targetSelect = document.getElementById('filterTahunTarget');
+    let monSelect = document.getElementById('filterTahun');
+    
+    let years = new Set();
+    if(globalRowData) {
+        globalRowData.forEach(r => { if(r[4]) years.add(r[4]); });
+    }
+    
+    let optionsHtml = '<option value="">Semua Tahun</option>';
+    Array.from(years).sort().reverse().forEach(y => {
+        optionsHtml += `<option value="${y}">${y}</option>`;
+    });
+    
+    // Samakan isinya
+    if (targetSelect) targetSelect.innerHTML = optionsHtml;
+    if (monSelect) monSelect.innerHTML = optionsHtml;
+    
+    let thisYear = new Date().getFullYear().toString();
+    let defaultVal = years.has(thisYear) ? thisYear : "";
+    
+    // Jika di monitoring sudah ada yang dipilih, ikuti nilainya
+    let selectedVal = (monSelect && monSelect.value !== "") ? monSelect.value : defaultVal;
+    
+    if (targetSelect) targetSelect.value = selectedVal;
+    if (monSelect) monSelect.value = selectedVal;
+}
+
+// FUNGSI BARU: Jika diubah dari halaman Target, paksa Monitoring untuk ngikutin
+function syncFilterTarget() {
+    let val = document.getElementById('filterTahunTarget').value;
+    let monSelect = document.getElementById('filterTahun');
+    
+    if (monSelect) {
+        monSelect.value = val;
+        // Trigger perubahan tabel di latar belakang agar tidak tertinggal data
+        if ($.fn.DataTable.isDataTable('#tabelMon')) {
+            $('#tabelMon').DataTable().draw();
+            updateTabelTriwulanFilter();
+        }
+    }
+    calculateTargetRPD();
+}
+
+function calculateTargetRPD() {
+    let selectedYear = document.getElementById('filterTahunTarget') ? document.getElementById('filterTahunTarget').value : "";
+    // 1. Hitung Total Pagu 51 dan 52
+    let pagu51 = 0; 
+    let pagu52 = 0;
+    
+    if (globalMasterData) {
+        globalMasterData.forEach(m => {
+            let jenbel = parseCode(m.name).jenbel;
+            if (jenbel === "51") pagu51 += parseFloat(m.pagu) || 0;
+            if (jenbel === "52") pagu52 += parseFloat(m.pagu) || 0;
+        });
+    }
+
+    // 2. Hitung RPD 51 dan 52 per Triwulan
+    let rpdTw = {
+        1: { 51: 0, 52: 0 },
+        2: { 51: 0, 52: 0 },
+        3: { 51: 0, 52: 0 },
+        4: { 51: 0, 52: 0 }
+    };
+
+    const twMap = {
+        "Januari": 1, "Februari": 1, "Maret": 1,
+        "April": 2, "Mei": 2, "Juni": 2,
+        "Juli": 3, "Agustus": 3, "September": 3,
+        "Oktober": 4, "November": 4, "Desember": 4
+    };
+
+    if (globalRowData) {
+        globalRowData.forEach(r => {
+            let jenbel = parseCode(r[2]).jenbel;
+            let bulan = r[3];
+            let tahun = r[4]; // <-- 1. Ambil tahun dari indeks data
+            
+            // Kolom r[5] adalah nilai RPD
+            let nominal = parseFloat(r[5]) || 0; 
+            let tw = twMap[bulan];
+            
+            // --- 2. TAMBAHKAN LOGIKA FILTER INI ---
+            // Jika dropdown ada isinya, dan tahun data tidak sama dengan tahun di dropdown, lewati (skip) data ini
+            if (selectedYear !== "" && tahun != selectedYear) {
+                return; 
+            }
+            // ---------------------------------------
+
+            if (tw && (jenbel === "51" || jenbel === "52")) {
+                rpdTw[tw][jenbel] += nominal;
+            }
+        });
+    }
+
+    // 3. Render HTML
+    let html = "";
+    
+    // Loop untuk 4 Triwulan
+    for (let i = 1; i <= 4; i++) {
+        let pct51 = parseFloat(document.getElementById(`pct_t${i}_51`).value) || 0;
+        let pct52 = parseFloat(document.getElementById(`pct_t${i}_52`).value) || 0;
+        
+        let tgt51 = Math.round((pct51 / 100) * pagu51);
+        let tgt52 = Math.round((pct52 / 100) * pagu52);
+        
+        let selisih51 = rpdTw[i][51] - tgt51;
+        let selisih52 = rpdTw[i][52] - tgt52;
+
+        // Logika warna dinamis untuk selisih (Merah jika minus, Hijau jika surplus)
+        let warnaSelisih51 = selisih51 < 0 ? 'var(--danger)' : (selisih51 > 0 ? 'var(--success)' : '#333');
+        let warnaSelisih52 = selisih52 < 0 ? 'var(--danger)' : (selisih52 > 0 ? 'var(--success)' : '#333');
+
+        html += `
+        <div class="target-col">
+            <div class="target-title">TRIWULAN ${i}</div>
+            
+            <table class="target-table tbl-pagu">
+                <tr><th colspan="2"><i class="fas fa-wallet"></i> Pagu Belanja</th></tr>
+                <tr><td width="50%">Belanja 51</td><td width="50%">Belanja 52</td></tr>
+                <tr><td>${numberWithCommas(pagu51)}</td><td>${numberWithCommas(pagu52)}</td></tr>
+            </table>
+
+            <table class="target-table tbl-target">
+                <tr><th colspan="2"><i class="fas fa-bullseye"></i> Target Penyerapan</th></tr>
+                <tr><td width="50%">Belanja 51</td><td width="50%">Belanja 52</td></tr>
+                <tr><td>${numberWithCommas(tgt51)}</td><td>${numberWithCommas(tgt52)}</td></tr>
+            </table>
+
+            <table class="target-table tbl-rpd">
+                <tr><th colspan="2"><i class="fas fa-money-check-alt"></i> RPD</th></tr>
+                <tr><td width="50%">Belanja 51</td><td width="50%">Belanja 52</td></tr>
+                <tr><td>${numberWithCommas(rpdTw[i][51])}</td><td>${numberWithCommas(rpdTw[i][52])}</td></tr>
+            </table>
+
+            <table class="target-table tbl-selisih">
+                <tr><th colspan="2"><i class="fas fa-balance-scale"></i> Selisih</th></tr>
+                <tr><td width="50%">Belanja 51</td><td width="50%">Belanja 52</td></tr>
+                <tr>
+                    <td style="color: ${warnaSelisih51};">${numberWithCommas(selisih51)}</td>
+                    <td style="color: ${warnaSelisih52};">${numberWithCommas(selisih52)}</td>
+                </tr>
+            </table>
+        </div>
+        `;
+    }
+
+    document.getElementById('targetRPDContainer').innerHTML = html;
+}
+
+/**
+ * Fungsi untuk mengolah data RPD dan memasukkannya ke tabel Triwulan.
+ * @param {Array} rows - Data array hasil dari getMonitoringData()
+ */
+/**
+ * Update Logika: Mengambil jenis belanja langsung dari kode Item
+ */
+function renderTabelTriwulan(rows) {
+  let rekap = {};
+
+  rows.forEach(row => {
+    let kodeItem = row[2]; // Nama Item (Contoh: WA.2886.EBA.51-...)
+    let bulan = row[3] ? row[3].toString().toUpperCase() : "";
+    let jumlah = parseFloat(row[5]) || 0;
+
+    // --- PERBAIKAN DI SINI ---
+    // Gunakan fungsi parseCode untuk mengambil jenbel (51/52) dari nama item
+    let infoKode = parseCode(kodeItem); 
+    let jenisBelanja = infoKode.jenbel; // Mengambil '51' atau '52' dari kode
+
+    // Jika kode tidak valid, default ke 52
+    if (jenisBelanja !== "51" && jenisBelanja !== "52") {
+      jenisBelanja = "52";
+    }
+    // -------------------------
+
+    let key = bulan + "_" + jenisBelanja;
+
+    if (!rekap[kodeItem]) rekap[kodeItem] = {};
+    if (!rekap[kodeItem][key]) rekap[kodeItem][key] = 0;
+    
+    rekap[kodeItem][key] += jumlah;
+  });
+
+  // Render HTML (Tetap sama)
+  document.getElementById("tbody-tw1").innerHTML = generateHTML(rekap, ["JANUARI", "FEBRUARI", "MARET"]);
+  document.getElementById("tbody-tw2").innerHTML = generateHTML(rekap, ["APRIL", "MEI", "JUNI"]);
+  document.getElementById("tbody-tw3").innerHTML = generateHTML(rekap, ["JULI", "AGUSTUS", "SEPTEMBER"]);
+  document.getElementById("tbody-tw4").innerHTML = generateHTML(rekap, ["OKTOBER", "NOVEMBER", "DESEMBER"]);
+}
+
+/**
+ * Fungsi pembantu untuk membuat baris HTML tabel (`<tr>`)
+ */
+/**
+ * Fungsi pembantu untuk membuat baris HTML tabel (`<tr>`)
+ */
+function generateHTML(rekap, listBulan) {
+  let html = "";
+  let totalAll = { b1_51: 0, b1_52: 0, b2_51: 0, b2_52: 0, b3_51: 0, b3_52: 0, grand: 0 };
+
+  for (let kode in rekap) {
+    let data = rekap[kode];
+    
+    // --- TAMBAHKAN BARIS INI UNTUK MEMOTONG KODE ---
+    // Mencari pola 4 angka, titik, lalu 3 huruf (contoh: 2886.EBA)
+    let matchPola = kode.match(/\d{4}\.[a-zA-Z]{3}/); 
+    let displayKode = matchPola ? matchPola[0] : kode; 
+    // -----------------------------------------------
+    
+    // Ambil nilai per bulan dan jenis, default 0 jika kosong
+    let b1_51 = data[listBulan[0] + "_51"] || 0;
+    let b1_52 = data[listBulan[0] + "_52"] || 0;
+    let b2_51 = data[listBulan[1] + "_51"] || 0;
+    let b2_52 = data[listBulan[1] + "_52"] || 0;
+    let b3_51 = data[listBulan[2] + "_51"] || 0;
+    let b3_52 = data[listBulan[2] + "_52"] || 0;
+
+    let totalBaris = b1_51 + b1_52 + b2_51 + b2_52 + b3_51 + b3_52;
+
+    // Hitung total ke bawah (kolom)
+    totalAll.b1_51 += b1_51; totalAll.b1_52 += b1_52;
+    totalAll.b2_51 += b2_51; totalAll.b2_52 += b2_52;
+    totalAll.b3_51 += b3_51; totalAll.b3_52 += b3_52;
+    totalAll.grand += totalBaris;
+
+    // Tampilkan hanya jika ada data di triwulan ini (total > 0)
+    if (totalBaris > 0) {
+      html += `<tr>
+        <td style="text-align:left;">${displayKode}</td>
+        <td class="col-51">${formatAngka(b1_51)}</td>
+        <td class="col-52">${formatAngka(b1_52)}</td>
+        <td class="col-51">${formatAngka(b2_51)}</td>
+        <td class="col-52">${formatAngka(b2_52)}</td>
+        <td class="col-51">${formatAngka(b3_51)}</td>
+        <td class="col-52">${formatAngka(b3_52)}</td>
+        <td style="font-weight:bold;">${formatAngka(totalBaris)}</td>
+      </tr>`;
+    }
+  }
+
+  // ... (Bagian TFOOT / TOTAL di bawahnya biarkan sama seperti sebelumnya) ...
+  
+  html += `<tr style="font-weight:bold; background-color:#f1f3f4;">
+    <td>TOTAL</td>
+    <td class="col-51">${formatAngka(totalAll.b1_51)}</td>
+    <td class="col-52">${formatAngka(totalAll.b1_52)}</td>
+    <td class="col-51">${formatAngka(totalAll.b2_51)}</td>
+    <td class="col-52">${formatAngka(totalAll.b2_52)}</td>
+    <td class="col-51">${formatAngka(totalAll.b3_51)}</td>
+    <td class="col-52">${formatAngka(totalAll.b3_52)}</td>
+    <td>${formatAngka(totalAll.grand)}</td>
+  </tr>`;
+
+  if(totalAll.grand === 0) {
+    return `<tr><td colspan="8" style="text-align:center; color:#999;">Tidak ada pengajuan RPD di Triwulan ini</td></tr>`;
+  }
+  return html;
+}
+
+// Format pemisah ribuan
+function formatAngka(angka) {
+  if (angka === 0) return "0";
+  return new Intl.NumberFormat('id-ID').format(angka);
+}
+
+google.script.run.withSuccessHandler(function(response) {
+   // Simpan ke variabel global agar bisa digunakan oleh filter
+   globalRowData = response.rows; 
+
+   // PANGGIL FUNGSI FILTER DISINI:
+   updateTabelTriwulanFilter();
+   
+}).getMonitoringData();
+
+function updateTabelTriwulanFilter() {
+    // Pastikan data global sudah tersedia
+    if (!globalRowData || globalRowData.length === 0) return;
+
+    var selectedYear = $('#filterTahun').val();
+    var selectedMonth = $('#filterBulan').val();
+
+    // Filter array data mentah berdasarkan pilihan dropdown
+    var filteredRows = globalRowData.filter(function(row) {
+        var rowYear = row[4];  // Index 4 adalah Tahun di globalRowData
+        var rowMonth = row[3]; // Index 3 adalah Bulan di globalRowData
+        
+        var matchYear = (selectedYear === "" || rowYear == selectedYear);
+        var matchMonth = (selectedMonth === "" || rowMonth == selectedMonth);
+        
+        return matchYear && matchMonth;
+    });
+
+    // Render ulang tabel triwulan dengan data yang sudah disaring
+    renderTabelTriwulan(filteredRows);
+}
+
+// --- FUNGSI EXPORT EXCEL KHUSUS TARGET RPD ---
+function downloadTargetExcel() {
+    // Ambil semua kolom triwulan dari DOM
+    let cols = document.querySelectorAll('.target-col');
+    if (cols.length === 0) {
+        alert("Data belum dimuat! Tunggu proses perhitungan selesai."); 
+        return;
+    }
+
+    let ws_data = [];
+    
+    // Baris Judul Header Sheet
+    ws_data.push(["TARGET MINIMAL PENYERAPAN RPD - BPS KOTA SOLOK"]);
+    ws_data.push([]); // Baris kosong
+
+    let rowTitles = [];
+    let rowPct = [];
+    
+    // Susun Judul Triwulan dan Persentase ke samping (Horizontal)
+    for (let i = 1; i <= 4; i++) {
+        rowTitles.push(`TRIWULAN ${i}`, "", ""); // Label Triwulan
+        let p51 = document.getElementById(`pct_t${i}_51`).value;
+        let p52 = document.getElementById(`pct_t${i}_52`).value;
+        rowPct.push(`Target 51: ${p51}% | Target 52: ${p52}%`, "", ""); // Info Persentase
+    }
+    ws_data.push(rowTitles);
+    ws_data.push(rowPct);
+    ws_data.push([]); // Baris kosong pembatas
+
+    // Looping 4 jenis tabel: Pagu, Target, RPD, Selisih
+    let tablesPerCol = cols[0].querySelectorAll('table').length; 
+
+    for (let t = 0; t < tablesPerCol; t++) {
+        let rowHeader1 = []; // Untuk nama tabel (Pagu Belanja, dll)
+        let rowHeader2 = []; // Untuk header (Belanja 51, Belanja 52)
+        let rowValues = [];  // Untuk nilai nominalnya
+
+        cols.forEach(col => {
+            let table = col.querySelectorAll('table')[t];
+            let title = table.querySelector('th').innerText.trim();
+            let headers = table.querySelectorAll('tr:nth-child(2) td');
+            let values = table.querySelectorAll('tr:nth-child(3) td');
+
+            rowHeader1.push(title, "", "");
+            rowHeader2.push(headers[0].innerText.trim(), headers[1].innerText.trim(), "");
+
+            let val1 = values[0].innerText.trim();
+            let val2 = values[1].innerText.trim();
+
+            // Ubah string angka Rupiah ke format Number Integer murni
+            let isNumRegex = /^-?\d{1,3}(\.\d{3})*$/;
+            let num1 = isNumRegex.test(val1) ? parseInt(val1.replace(/\./g, ""), 10) : val1;
+            let num2 = isNumRegex.test(val2) ? parseInt(val2.replace(/\./g, ""), 10) : val2;
+
+            rowValues.push(num1, num2, "");
+        });
+
+        // Masukkan baris ke dalam array sheet
+        ws_data.push(rowHeader1);
+        ws_data.push(rowHeader2);
+        ws_data.push(rowValues);
+        ws_data.push([]); // Baris kosong untuk memisahkan antar tabel
+    }
+
+    // Convert array ke format sheet menggunakan library SheetJS
+    let ws = XLSX.utils.aoa_to_sheet(ws_data);
+
+    // Styling otomatis untuk angka agar diformat jadi Number/Accounting di Excel
+    for (let cellRef in ws) {
+        if (cellRef[0] === '!') continue;
+        let cell = ws[cellRef];
+        if (typeof cell.v === 'number') {
+            cell.z = '#,##0'; // Memberi separator titik/koma default standar Excel
+        }
+    }
+
+    // Buat file Workbook lalu download
+    let wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Target_RPD");
+    
+    // Nama file dinamis dengan tanggal
+    let today = new Date();
+    let dateStr = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, '0') + "-" + String(today.getDate()).padStart(2, '0');
+    
+    XLSX.writeFile(wb, "Target_Minimal_Penyerapan_RPD_" + dateStr + ".xlsx");
+}
+
+
+// --- FUNGSI EXPORT EXCEL KHUSUS RINCIAN TRIWULAN ---
+function downloadRincianExcel() {
+    let wb = XLSX.utils.book_new();
+    let ws_data = [];
+    
+    // Baris Judul Header Sheet
+    ws_data.push(["DETAIL RINCIAN RPD PER TRIWULAN - BPS KOTA SOLOK"]);
+    
+    // Cek Tahun Filter jika ada
+    let tahun = document.getElementById('filterTahunTarget') ? document.getElementById('filterTahunTarget').value : "";
+    if(tahun) ws_data.push(["Tahun: " + tahun]);
+    
+    ws_data.push([]); // Baris kosong
+    
+    // Ambil semua tabel rincian
+    let tables = document.querySelectorAll(".tabel-rpd");
+    let titles = ["RINCIAN RPD TRIWULAN 1", "RINCIAN RPD TRIWULAN 2", "RINCIAN RPD TRIWULAN 3", "RINCIAN RPD TRIWULAN 4"];
+    
+    tables.forEach((table, index) => {
+        ws_data.push([titles[index]]); // Label Triwulan
+        
+        // Parse tabel ke array (raw: true agar HTML tidak otomatis convert angka sembarangan)
+        let sheet = XLSX.utils.table_to_sheet(table, { raw: true });
+        let json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        
+        // Bersihkan format titik ribuan agar terbaca sebagai angka murni di Excel
+        json.forEach(row => {
+            row.forEach((cell, colIdx) => {
+                if (typeof cell === 'string') {
+                    let val = cell.trim();
+                    // Regex deteksi format ribuan (Contoh: 15.000.000 atau 0)
+                    if (/^-?\d{1,3}(\.\d{3})*$/.test(val)) {
+                        let num = parseInt(val.replace(/\./g, ""), 10);
+                        if (!isNaN(num)) {
+                            row[colIdx] = num; // Timpa string dengan format Number
+                        }
+                    }
+                }
+            });
+        });
+        
+        // Gabungkan data tabel ini ke array utama
+        ws_data = ws_data.concat(json);
+        ws_data.push([]); // Baris kosong pembatas antar tabel
+    });
+    
+    // Convert array 2D ke format worksheet menggunakan library SheetJS
+    let ws = XLSX.utils.aoa_to_sheet(ws_data);
+    
+    // Beri styling otomatis agar angka di Excel diformat dengan pemisah ribuan (#,##0)
+    for (let cellRef in ws) {
+        if (cellRef[0] === '!') continue;
+        let cell = ws[cellRef];
+        if (typeof cell.v === 'number') {
+            cell.z = '#,##0'; 
+        }
+    }
+    
+    // Masukkan sheet ke workbook
+    XLSX.utils.book_append_sheet(wb, ws, "Rincian_Triwulan");
+    
+    // Buat nama file dinamis dengan tanggal cetak
+    let today = new Date();
+    let dateStr = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, '0') + "-" + String(today.getDate()).padStart(2, '0');
+    
+    // Eksekusi download
+    XLSX.writeFile(wb, "Rincian_RPD_Triwulan_" + dateStr + ".xlsx");
 }
 
 </script>
