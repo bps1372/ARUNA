@@ -1,4 +1,4 @@
 # ARUNA
-Update V1.47
+Update V1.54
 
-26 Februari 2026
+4 Maret 2026
