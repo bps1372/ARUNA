@@ -225,23 +225,6 @@
       .left{ padding:30px; }
       .header-logo { justify-content: center; }
     }
-
-
-      /* --- TAMBAHAN CSS UNTUK ANIMASI KENDARAAN --- */
-      @keyframes driving {
-        0%   { transform: translateY(0px) rotate(0deg); }
-        25%  { transform: translateY(-1px) rotate(-1deg); }
-        50%  { transform: translateY(0px) rotate(0deg); }
-        75%  { transform: translateY(-2px) rotate(2deg); }
-        100% { transform: translateY(0px) rotate(0deg); }
-      }
-
-      /* Kelas untuk menerapkan animasi ke ikon kendaraan */
-      /* Kita kurangi margin-right sedikit agar jarak antar kendaraan tidak terlalu jauh */
-      .icon-motor-loading {
-        animation: driving 0.3s infinite linear; /* Kecepatan animasi */
-        margin-right: 5px; /* Jarak antar ikon */
-      }
   </style>
 </head>
 
@@ -266,7 +249,7 @@
     </div>
 
     <div class="right">
-      <h2>Selamat Datang <br> Sobat ARUNA</h2>
+      <h2>Selamat Datang</h2>
       <p>Silakan masuk ke akun ARUNA Anda</p>
 
       <input id="username" placeholder="Username">
@@ -312,9 +295,6 @@
         <li><b>Monitoring:</b> tabel monitoring serta rincian infografis anggaran diajukan dan ter-realisasi.</li>
       </ul>
 
-     
-                
-      
       <button style="margin-top: 20px;" onclick="closeModal()">SAYA MENGERTI</button>
     </div>
   </div>
@@ -343,7 +323,7 @@
       
       // 2. Ubah tampilan tombol saat proses dimulai
       const originalText = btn.innerHTML; // Simpan teks asli
-      btn.innerHTML = '</i><i class="fas fa-car-side icon-motor-loading"></i><i class="fas fa-motorcycle icon-motor-loading" style="margin-right: 10px;"></i> .....Login';
+      btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Proses Login'; // Pakai ikon loading
       btn.disabled = true; // Matikan tombol agar tidak diklik 2x
       btn.style.opacity = "0.7";
       btn.style.cursor = "not-allowed";
