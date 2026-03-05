@@ -1,13 +1,13 @@
 /* ===============================
    KONFIGURASI SPREADSHEET
 ================================*/
-const SPREADSHEET_ID = "1I_ep09_tnTSqycD_HL6kXXZchhkDYk8tGvcdqRX5Z7U"; // ID Spreadsheet USER
+const SPREADSHEET_ID = "xxxx"; // ID Spreadsheet USER
 const SHEET_NAME = "user";
 
 // ID Spreadsheet DATABASE (INPUTAN & MASTER ITEM)
-const ANGGARAN_SPREADSHEET_ID = "1nYki_KwwQdPpIlE7A-TOhFO1-jucrwOTmrM3SJnha3o"; 
-const ANGGARAN_SHEET = "INPUTAN";
-const MASTER_ITEM_SHEET = "MasterItem"; 
+const ANGGARAN_SPREADSHEET_ID = "xxx"; 
+const ANGGARAN_SHEET = "xxx";
+const MASTER_ITEM_SHEET = "xxx"; 
 
 /* ===============================
    DO GET (Render HTML)
@@ -322,5 +322,22 @@ function saveMasterItemData(data) {
     return { status: 'success' };
   } catch (e) {
     return { status: 'error', message: e.toString() };
+  }
+}
+
+function deleteMasterItemData(rowIndex) {
+  try {
+    // PERBAIKAN 1: Gunakan variabel ANGGARAN_SPREADSHEET_ID yang sudah kamu buat di atas
+    var ss = SpreadsheetApp.openById(ANGGARAN_SPREADSHEET_ID); 
+    var sheet = ss.getSheetByName(MASTER_ITEM_SHEET); 
+    
+    // PERBAIKAN 2: Tambah + 2 karena index javascript mulai dari 0, dan data aslimu ada di baris 2
+    var targetBaris = parseInt(rowIndex) + 2; 
+    
+    sheet.deleteRow(targetBaris);
+    
+    return { status: 'success', message: 'Item berhasil dihapus' };
+  } catch (e) {
+    return { status: 'error', message: e.message };
   }
 }
