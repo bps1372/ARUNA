@@ -2,6 +2,7 @@
 Last Update V1.54 - 4 Maret 2026
 
 Platform: Google Appscript & Google Workspace
+
 Bahasa Pmerograman: 
 <p align="center">
   <img src="https://img.shields.io/badge/Google_Apps_Script-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="Javascript" />
