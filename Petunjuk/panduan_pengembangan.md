@@ -6,4 +6,7 @@ Untuk pengembangan
  
 - Lalu sesuaikan code dan pengembangannya di https://script.google.com/
 
+Gambaran UI UX Aruna Last Update:
+https://bps1372.github.io/ARUNA/code_appscript/login.html
+https://bps1372.github.io/ARUNA/code_appscript/dashboard.html
 
