@@ -2,11 +2,11 @@
 /* ===============================
    KONFIGURASI SPREADSHEET
 ================================*/
-const SPREADSHEET_ID = "xxx"; // ID Spreadsheet USER
+const SPREADSHEET_ID = "xxx"; // ID Spreadsheet Kelola akun
 const SHEET_NAME = "user";
 
 // ID Spreadsheet DATABASE (INPUTAN & MASTER ITEM)
-const ANGGARAN_SPREADSHEET_ID = "xxx"; 
+const ANGGARAN_SPREADSHEET_ID = "xxx"; // ID spreadhseet Database
 const ANGGARAN_SHEET = "INPUTAN";
 const MASTER_ITEM_SHEET = "MasterItem"; 
 
